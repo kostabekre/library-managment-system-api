@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace LibraryManagementSystemAPI;
 
 [ApiController]
-[Route("api/{controller}")]
-public class BooksController : Controller
+[Route("api/[controller]")]
+public class BooksController : ControllerBase
 {
 
     private readonly IBookRepository _bookRepository;
@@ -19,6 +19,7 @@ public class BooksController : Controller
     }
 
     [HttpGet]
+    [Route("all")]
     public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetAllBooksShortInfo()
     {
         var books = await _bookRepository.GetAllBooksShortInfo();
