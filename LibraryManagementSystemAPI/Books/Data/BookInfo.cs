@@ -10,7 +10,7 @@ public class BookInfo
     public string? CoverPath { get; set; }
     public IEnumerable<Author>? Authors { get; set; }
     public Publisher? Publisher { get; set; }
-    public IEnumerable<Genre>? BookGenres { get; set; }
+    public IEnumerable<Genre>? Genres { get; set; }
     public int BooksRating { get; set; }
     public int BookAmount { get; set; }
     public DateTime DatePublished { get; set; }
@@ -25,7 +25,7 @@ public class BookInfo
         CoverPath = book.CoverPath;
         Authors = book.Authors;
         Publisher = book.Publisher;
-        BookGenres = book.BookGenres.Select(bg => bg.Genre).ToList();
+        Genres = book.Genres.ToList();
         DatePublished = DatePublished;
     }
 }

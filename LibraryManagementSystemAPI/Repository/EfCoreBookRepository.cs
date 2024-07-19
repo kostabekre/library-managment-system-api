@@ -33,18 +33,12 @@ public class EfCoreBookRepository : IBookRepository
         return new PagedList<IList<BookShortInfo>>(result, parameters.PageSize, parameters.PageNumber, result.Count);
     }
 
-    public async Task<BookInfo> CreateBook(BookCreateModel model)
+    public async Task<int> CreateBook(BookCreateDTO dto)
     {
-        var book = new Book()
-        {
-            Name = model.Name,
-            PublisherId = model.PublisherId,
-            Authors = model.AuthorsId.Select(id => new Author() { Id = id }),
-            BookGenres = model.BookGenresId.Select(genreId => new BookGenre() { GenreId = genreId })
-        };
+        var book = BookCreateDTO.Convert(dto, null);
         _bookContext.Books.Add(book);
         await _bookContext.SaveChangesAsync();
-        return new BookInfo(book);
+        return book.Id;
     }
 
     public async Task<BookInfo?> GetBook(int id)

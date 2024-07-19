@@ -9,8 +9,8 @@ public class Book
     public IEnumerable<Author>? Authors { get; set; }
     public int PublisherId { get; set; }
     public Publisher? Publisher { get; set; }
-    public IEnumerable<BookGenre>? BookGenres { get; set; }
-    public BooksRating BooksRating { get; set; }
-    public BookAmount BookAmount { get; set; }
+    public IEnumerable<Genre>? Genres { get; set; }
+    public BookRating? Rating { get; set; }
+    public BookAmount? Amount { get; set; }
     public DateTime DatePublished { get; set; }
 }

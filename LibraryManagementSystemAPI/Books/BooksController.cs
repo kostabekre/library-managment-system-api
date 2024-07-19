@@ -1,5 +1,6 @@
 using System.Text.Json;
 using LibraryManagementSystemAPI.Books.Data;
+using LibraryManagementSystemAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystemAPI;
@@ -8,11 +9,10 @@ namespace LibraryManagementSystemAPI;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
-
     private readonly IBookRepository _bookRepository;
-    private readonly ILogger _logger;
+    private readonly ILogger<BooksController> _logger;
 
-    public BooksController(IBookRepository bookRepository, ILogger logger)
+    public BooksController(IBookRepository bookRepository, ILogger<BooksController> logger)
     {
         _bookRepository = bookRepository;
         _logger = logger;
@@ -59,11 +59,11 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<BookInfo>> CreateBook(BookCreateModel model)
+    public async Task<ActionResult> CreateBook(BookCreateDTO book)
     {
-        var book = await _bookRepository.CreateBook(model);
+        var createdId = await _bookRepository.CreateBook(book);
 
-        return CreatedAtAction(nameof(CreateBook), book);
+        return CreatedAtAction(nameof(GetBook), new { createdId }, createdId);
     }
 
     [HttpPut]

@@ -37,6 +37,21 @@ namespace LibraryManagementSystemAPI.Migrations
                     b.ToTable("AuthorBook");
                 });
 
+            modelBuilder.Entity("BookGenre", b =>
+                {
+                    b.Property<int>("BooksId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("GenresId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("BooksId", "GenresId");
+
+                    b.HasIndex("GenresId");
+
+                    b.ToTable("BookGenre");
+                });
+
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.Author", b =>
                 {
                     b.Property<int>("Id")
@@ -103,22 +118,7 @@ namespace LibraryManagementSystemAPI.Migrations
                     b.ToTable("BooksAmount");
                 });
 
-            modelBuilder.Entity("LibraryManagementSystemAPI.Models.BookGenre", b =>
-                {
-                    b.Property<int>("BookId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("GenreId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("BookId", "GenreId");
-
-                    b.HasIndex("GenreId");
-
-                    b.ToTable("BookGenre");
-                });
-
-            modelBuilder.Entity("LibraryManagementSystemAPI.Models.BooksRating", b =>
+            modelBuilder.Entity("LibraryManagementSystemAPI.Models.BookRating", b =>
                 {
                     b.Property<int>("BookId")
                         .HasColumnType("integer");
@@ -184,6 +184,21 @@ namespace LibraryManagementSystemAPI.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BookGenre", b =>
+                {
+                    b.HasOne("LibraryManagementSystemAPI.Models.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BooksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LibraryManagementSystemAPI.Models.Genre", null)
+                        .WithMany()
+                        .HasForeignKey("GenresId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.Book", b =>
                 {
                     b.HasOne("LibraryManagementSystemAPI.Models.Publisher", "Publisher")
@@ -198,7 +213,7 @@ namespace LibraryManagementSystemAPI.Migrations
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.BookAmount", b =>
                 {
                     b.HasOne("LibraryManagementSystemAPI.Models.Book", "Book")
-                        .WithOne("BookAmount")
+                        .WithOne("Amount")
                         .HasForeignKey("LibraryManagementSystemAPI.Models.BookAmount", "BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -206,30 +221,11 @@ namespace LibraryManagementSystemAPI.Migrations
                     b.Navigation("Book");
                 });
 
-            modelBuilder.Entity("LibraryManagementSystemAPI.Models.BookGenre", b =>
+            modelBuilder.Entity("LibraryManagementSystemAPI.Models.BookRating", b =>
                 {
                     b.HasOne("LibraryManagementSystemAPI.Models.Book", "Book")
-                        .WithMany("BookGenres")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LibraryManagementSystemAPI.Models.Genre", "Genre")
-                        .WithMany()
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Book");
-
-                    b.Navigation("Genre");
-                });
-
-            modelBuilder.Entity("LibraryManagementSystemAPI.Models.BooksRating", b =>
-                {
-                    b.HasOne("LibraryManagementSystemAPI.Models.Book", "Book")
-                        .WithOne("BooksRating")
-                        .HasForeignKey("LibraryManagementSystemAPI.Models.BooksRating", "BookId")
+                        .WithOne("Rating")
+                        .HasForeignKey("LibraryManagementSystemAPI.Models.BookRating", "BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -238,13 +234,9 @@ namespace LibraryManagementSystemAPI.Migrations
 
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.Book", b =>
                 {
-                    b.Navigation("BookAmount")
-                        .IsRequired();
+                    b.Navigation("Amount");
 
-                    b.Navigation("BookGenres");
-
-                    b.Navigation("BooksRating")
-                        .IsRequired();
+                    b.Navigation("Rating");
                 });
 
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.Publisher", b =>
