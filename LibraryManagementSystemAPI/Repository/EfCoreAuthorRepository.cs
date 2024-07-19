@@ -42,4 +42,9 @@ public class EfCoreAuthorRepository : IAuthorRepository
 
         return rowsUpdated > 0;
     }
+
+    public async Task<IEnumerable<Author>> GetAllAuthors()
+    {
+        return await _bookContext.Authors.ToListAsync();
+    }
 }

@@ -1,36 +1,72 @@
 using LibraryManagementSystemAPI.Books.Data;
+using LibraryManagementSystemAPI.Context;
+using LibraryManagementSystemAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementSystemAPI.Repository;
 
 public class EfCoreBookRepository : IBookRepository
 {
-    public Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfo()
+    private readonly BookContext _bookContext;
+
+    public EfCoreBookRepository(BookContext bookContext)
     {
-        throw new NotImplementedException();
+        _bookContext = bookContext;
     }
 
-    public Task<PagedList<BookShortInfo>> GetBooksShortInfo(BookParameters parameters)
+    public async Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfo() => await _bookContext.Books
+        .Include(b => b.Publisher)
+        .Include(b => b.Authors)
+        .Select(b => new BookShortInfo(b.Name, b.CoverPath, b.Authors.First().Name, b.Publisher.Name)).ToListAsync();
+
+    public async Task<PagedList<IList<BookShortInfo>>> GetBooksShortInfo(BookParameters parameters)
     {
-        throw new NotImplementedException();
+        var result = await _bookContext.Books
+            .OrderBy(b => b.Name)
+            .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+            .Take(parameters.PageSize)
+            .Include(b => b.Authors)
+            .Include(b => b.Publisher)
+            .Select(b => new BookShortInfo(b.Name, b.CoverPath, b.Authors.First().Name, b.Publisher.Name))
+            .ToListAsync();
+
+        return new PagedList<IList<BookShortInfo>>(result, parameters.PageSize, parameters.PageNumber, result.Count);
     }
 
-    public Task<BookInfo> CreateBook(BookCreateModel model)
+    public async Task<BookInfo> CreateBook(BookCreateModel model)
     {
-        throw new NotImplementedException();
+        var book = new Book()
+        {
+            Name = model.Name,
+            PublisherId = model.PublisherId,
+            Authors = model.AuthorsId.Select(id => new Author() { Id = id }),
+            BookGenres = model.BookGenresId.Select(genreId => new BookGenre() { GenreId = genreId })
+        };
+        _bookContext.Books.Add(book);
+        await _bookContext.SaveChangesAsync();
+        return new BookInfo(book);
     }
 
-    public Task<BookInfo?> GetBook(int id)
+    public async Task<BookInfo?> GetBook(int id)
     {
-        throw new NotImplementedException();
+        var book = await _bookContext.Books.FirstOrDefaultAsync(b => b.Id == id);
+        if (book == null)
+        {
+            return null;
+        }
+        return new BookInfo(book);
     }
 
-    public Task<bool> RemoveBook(int id)
+    public async Task<bool> RemoveBook(int id)
     {
-        throw new NotImplementedException();
+        var rowsDeleted = await _bookContext.Books.Where(b => b.Id == id).ExecuteDeleteAsync();
+        return rowsDeleted > 0;
     }
 
-    public Task<bool> UpdateBook(int id, BookInfo book)
+    public async Task<bool> UpdateBook(int id, BookInfo book)
     {
-        throw new NotImplementedException();
+        var rowsUpdated = await _bookContext.Books.Where(b => b.Id == id).ExecuteUpdateAsync(properties => properties
+            .SetProperty(b => b.Name, book.Name));
+        return rowsUpdated > 0;
     }
 }

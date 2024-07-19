@@ -15,10 +15,21 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpGet]
+    public async Task<ActionResult<IEnumerable<Author>>> GetAllAuthors()
+    {
+        IEnumerable<Author> author = await _authorRepository.GetAllAuthors();
+        return Ok(author);
+    }
+    
+    [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult<Author>> GetAuthor(int id)
     {
-        Author author = await _authorRepository.GetAuthor(id);
+        Author? author = await _authorRepository.GetAuthor(id);
+        if (author == null)
+        {
+            return NotFound();
+        }
         return Ok(author);
     }
 
@@ -26,7 +37,7 @@ public class AuthorsController : ControllerBase
     public async Task<ActionResult<Author>> CreateAuthor(Author author)
     {
         await _authorRepository.CreateAuthor(author);
-        return CreatedAtAction(nameof(CreateAuthor), author);
+        return CreatedAtAction(nameof(GetAuthor), new {author.Id}, author);
     }
 
     [HttpPut]

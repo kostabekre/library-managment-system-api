@@ -9,7 +9,7 @@ public static class RepositoryAddExtensions
         services.AddScoped<IAuthorRepository, EfCoreAuthorRepository>();
         services.AddScoped<IBookRepository, EfCoreBookRepository>();
         services.AddScoped<IGenreRepository, EfCoreGenreRepository>();
-        services.AddScoped<IPublisherRepository, IPublisherRepository>();
+        services.AddScoped<IPublisherRepository, EfCorePublisherRepository>();
         return services;
     }
 }

@@ -8,4 +8,5 @@ public interface IPublisherRepository
     Task CreatePublisher(Publisher author);
     Task<bool> UpdatePublisher(int id, Publisher publisher);
     Task<bool> DeletePublisher(int id);
+    Task<IEnumerable<Publisher>> GetAllPublishers();
 }

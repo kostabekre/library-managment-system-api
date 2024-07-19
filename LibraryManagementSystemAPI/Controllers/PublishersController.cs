@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LibraryManagementSystemAPI.Controllers;
 
 [ApiController]
-[Route("api/{controller}")]
+[Route("api/[controller]")]
 public class PublishersController : ControllerBase
 {
     private readonly IPublisherRepository _publisherRepository;
@@ -15,6 +15,13 @@ public class PublishersController : ControllerBase
         _publisherRepository = publisherRepository;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<Publisher>> GetAllPublishers()
+    {
+        IEnumerable<Publisher> publishers = await _publisherRepository.GetAllPublishers();
+        return Ok(publishers);
+    }
+    
     [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult<Publisher>> GetPublisher(int id)
@@ -31,7 +38,7 @@ public class PublishersController : ControllerBase
     public async Task<ActionResult<Publisher>> CreatePublisher(Publisher publisher)
     {
         await _publisherRepository.CreatePublisher(publisher);
-        return CreatedAtAction(nameof(GetPublisher), publisher);
+        return CreatedAtAction(nameof(GetPublisher), new {publisher.Id}, publisher);
     }
 
     [HttpPut]

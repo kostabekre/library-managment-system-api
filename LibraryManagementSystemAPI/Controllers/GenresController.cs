@@ -15,9 +15,14 @@ public class GenresController : ControllerBase
     }
 
     [HttpGet]
+    [Route("{id}")]
     public async Task<ActionResult<Genre>> GetGenre(int id)
     {
         Genre? genre = await _genreRepository.GetGenre(id);
+        if (genre == null)
+        {
+            return NotFound();
+        }
         return Ok(genre);
     }
     

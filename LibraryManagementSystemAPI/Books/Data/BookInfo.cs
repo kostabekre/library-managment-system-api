@@ -1,3 +1,5 @@
+using LibraryManagementSystemAPI.Models;
+
 namespace LibraryManagementSystemAPI.Books.Data;
 
 public class BookInfo
@@ -6,10 +8,24 @@ public class BookInfo
     public string Name { get; set; }
     public string ISBN { get; set; }
     public string? CoverPath { get; set; }
-    public int[] AuthorsId { get; set; }
-    public int PublisherId { get; set; }
-    public string[] BookGenres { get; set; }
+    public IEnumerable<Author>? Authors { get; set; }
+    public Publisher? Publisher { get; set; }
+    public IEnumerable<Genre>? BookGenres { get; set; }
     public int BooksRating { get; set; }
     public int BookAmount { get; set; }
     public DateTime DatePublished { get; set; }
+
+    public BookInfo() {}
+
+    public BookInfo(Book book)
+    {
+        Id = book.Id;
+        Name = book.Name;
+        ISBN = book.ISBN;
+        CoverPath = book.CoverPath;
+        Authors = book.Authors;
+        Publisher = book.Publisher;
+        BookGenres = book.BookGenres.Select(bg => bg.Genre).ToList();
+        DatePublished = DatePublished;
+    }
 }
