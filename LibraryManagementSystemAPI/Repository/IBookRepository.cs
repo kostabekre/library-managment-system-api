@@ -10,5 +10,5 @@ public interface IBookRepository
     Task<int> CreateBook(BookCreateDTO model);
     Task<BookInfo?> GetBook(int id);
     Task<bool> RemoveBook(int id);
-    Task<bool> UpdateBook(int id, BookInfo book);
+    Task<bool> UpdateBook(int id, BookUpdateDTO bookDTO);
 }

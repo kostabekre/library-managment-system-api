@@ -50,6 +50,6 @@ public class GenresController : ControllerBase
     public async Task<ActionResult<Genre>> CreateGenre(Genre genre)
     {
         await _genreRepository.CreateGenre(genre);
-        return CreatedAtAction(nameof(GetGenre), genre);
+        return CreatedAtAction(nameof(GetGenre), new {genre.Id}, genre);
     }
 }

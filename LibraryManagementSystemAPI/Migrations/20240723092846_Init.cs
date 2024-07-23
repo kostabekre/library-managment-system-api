@@ -77,24 +77,24 @@ namespace LibraryManagementSystemAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AuthorBook",
+                name: "BookAuthor",
                 columns: table => new
                 {
-                    AuthorsId = table.Column<int>(type: "integer", nullable: false),
-                    BooksId = table.Column<int>(type: "integer", nullable: false)
+                    BookId = table.Column<int>(type: "integer", nullable: false),
+                    AuthorId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuthorBook", x => new { x.AuthorsId, x.BooksId });
+                    table.PrimaryKey("PK_BookAuthor", x => new { x.AuthorId, x.BookId });
                     table.ForeignKey(
-                        name: "FK_AuthorBook_Authors_AuthorsId",
-                        column: x => x.AuthorsId,
+                        name: "FK_BookAuthor_Authors_AuthorId",
+                        column: x => x.AuthorId,
                         principalTable: "Authors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AuthorBook_Books_BooksId",
-                        column: x => x.BooksId,
+                        name: "FK_BookAuthor_Books_BookId",
+                        column: x => x.BookId,
                         principalTable: "Books",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -104,21 +104,21 @@ namespace LibraryManagementSystemAPI.Migrations
                 name: "BookGenre",
                 columns: table => new
                 {
-                    BooksId = table.Column<int>(type: "integer", nullable: false),
-                    GenresId = table.Column<int>(type: "integer", nullable: false)
+                    BookId = table.Column<int>(type: "integer", nullable: false),
+                    GenreId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BookGenre", x => new { x.BooksId, x.GenresId });
+                    table.PrimaryKey("PK_BookGenre", x => new { x.BookId, x.GenreId });
                     table.ForeignKey(
-                        name: "FK_BookGenre_Books_BooksId",
-                        column: x => x.BooksId,
+                        name: "FK_BookGenre_Books_BookId",
+                        column: x => x.BookId,
                         principalTable: "Books",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BookGenre_Genres_GenresId",
-                        column: x => x.GenresId,
+                        name: "FK_BookGenre_Genres_GenreId",
+                        column: x => x.GenreId,
                         principalTable: "Genres",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -161,14 +161,14 @@ namespace LibraryManagementSystemAPI.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthorBook_BooksId",
-                table: "AuthorBook",
-                column: "BooksId");
+                name: "IX_BookAuthor_BookId",
+                table: "BookAuthor",
+                column: "BookId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookGenre_GenresId",
+                name: "IX_BookGenre_GenreId",
                 table: "BookGenre",
-                column: "GenresId");
+                column: "GenreId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Books_PublisherId",
@@ -180,7 +180,7 @@ namespace LibraryManagementSystemAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AuthorBook");
+                name: "BookAuthor");
 
             migrationBuilder.DropTable(
                 name: "BookGenre");

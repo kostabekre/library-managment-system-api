@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LibraryManagementSystemAPI.Migrations
 {
     [DbContext(typeof(BookContext))]
-    [Migration("20240719120038_Init")]
+    [Migration("20240723092846_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -25,32 +25,32 @@ namespace LibraryManagementSystemAPI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("AuthorBook", b =>
+            modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.BookAuthor", b =>
                 {
-                    b.Property<int>("AuthorsId")
+                    b.Property<int>("AuthorId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("BooksId")
+                    b.Property<int>("BookId")
                         .HasColumnType("integer");
 
-                    b.HasKey("AuthorsId", "BooksId");
+                    b.HasKey("AuthorId", "BookId");
 
-                    b.HasIndex("BooksId");
+                    b.HasIndex("BookId");
 
-                    b.ToTable("AuthorBook");
+                    b.ToTable("BookAuthor");
                 });
 
-            modelBuilder.Entity("BookGenre", b =>
+            modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.BookGenre", b =>
                 {
-                    b.Property<int>("BooksId")
+                    b.Property<int>("BookId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("GenresId")
+                    b.Property<int>("GenreId")
                         .HasColumnType("integer");
 
-                    b.HasKey("BooksId", "GenresId");
+                    b.HasKey("BookId", "GenreId");
 
-                    b.HasIndex("GenresId");
+                    b.HasIndex("GenreId");
 
                     b.ToTable("BookGenre");
                 });
@@ -172,32 +172,32 @@ namespace LibraryManagementSystemAPI.Migrations
                     b.ToTable("Publishers");
                 });
 
-            modelBuilder.Entity("AuthorBook", b =>
+            modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.BookAuthor", b =>
                 {
                     b.HasOne("LibraryManagementSystemAPI.Models.Author", null)
-                        .WithMany()
-                        .HasForeignKey("AuthorsId")
+                        .WithMany("BookAuthors")
+                        .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LibraryManagementSystemAPI.Models.Book", null)
-                        .WithMany()
-                        .HasForeignKey("BooksId")
+                        .WithMany("BookAuthors")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BookGenre", b =>
+            modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.BookGenre", b =>
                 {
                     b.HasOne("LibraryManagementSystemAPI.Models.Book", null)
-                        .WithMany()
-                        .HasForeignKey("BooksId")
+                        .WithMany("BookGenres")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LibraryManagementSystemAPI.Models.Genre", null)
-                        .WithMany()
-                        .HasForeignKey("GenresId")
+                        .WithMany("BookGenres")
+                        .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -235,11 +235,25 @@ namespace LibraryManagementSystemAPI.Migrations
                     b.Navigation("Book");
                 });
 
+            modelBuilder.Entity("LibraryManagementSystemAPI.Models.Author", b =>
+                {
+                    b.Navigation("BookAuthors");
+                });
+
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.Book", b =>
                 {
                     b.Navigation("Amount");
 
+                    b.Navigation("BookAuthors");
+
+                    b.Navigation("BookGenres");
+
                     b.Navigation("Rating");
+                });
+
+            modelBuilder.Entity("LibraryManagementSystemAPI.Models.Genre", b =>
+                {
+                    b.Navigation("BookGenres");
                 });
 
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.Publisher", b =>

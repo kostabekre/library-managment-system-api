@@ -15,15 +15,15 @@ public class BookCreateDTO
 
     public static Book Convert(BookCreateDTO dto, string? coverPath)
     {
-        return new Book()
+        var book = new Book()
         {
             Name = dto.Name,
             ISBN = dto.ISBN,
             CoverPath = coverPath,
-            Authors = dto.AuthorsId.Select(a => new Author() { Id = a }).ToList(),
             PublisherId = dto.PublisherId,
-            Genres = dto.GenresId.Select(g => new Genre() { Id = g }).ToList(),
             DatePublished = dto.DatePublished
         };
+
+        return book;
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,11 +21,13 @@ public class BookContext : DbContext
 
         modelBuilder.Entity<Book>()
             .HasMany(b => b.Genres)
-            .WithMany(g => g.Books);
-        
+            .WithMany(g => g.Books)
+            .UsingEntity<BookGenre>();
+
         modelBuilder.Entity<Book>()
             .HasMany(b => b.Authors)
-            .WithMany(g => g.Books);
+            .WithMany(g => g.Books)
+            .UsingEntity<BookAuthor>();
 
         modelBuilder.Entity<BookRating>()
             .HasOne(r => r.Book);

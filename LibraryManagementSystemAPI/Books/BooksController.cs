@@ -2,6 +2,7 @@ using System.Text.Json;
 using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementSystemAPI;
 
@@ -27,7 +28,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PagedList<BookShortInfo>>> GetBooksShortInfo(BookParameters parameters)
+    public async Task<ActionResult<PagedList<BookShortInfo>>> GetBooksShortInfo([FromQuery]BookParameters parameters)
     {
         var books = await _bookRepository.GetBooksShortInfo(parameters);
         var metadata = new
@@ -61,14 +62,23 @@ public class BooksController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateBook(BookCreateDTO book)
     {
-        var createdId = await _bookRepository.CreateBook(book);
 
-        return CreatedAtAction(nameof(GetBook), new { createdId }, createdId);
+        int createdId;
+        try
+        {
+            createdId = await _bookRepository.CreateBook(book);
+        }
+        catch (DbUpdateException e)
+        {
+            return BadRequest();
+        }
+
+        return CreatedAtAction(nameof(GetBook), new { Id = createdId }, createdId);
     }
 
     [HttpPut]
     [Route("{id}")]
-    public async Task<ActionResult<BookInfo>> UpdateBook(int id, BookInfo book)
+    public async Task<ActionResult<BookInfo>> UpdateBook(int id, BookUpdateDTO book)
     {
         bool updated = await _bookRepository.UpdateBook(id, book);
         if (!updated)

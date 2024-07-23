@@ -26,6 +26,6 @@ public class BookInfo
         Authors = book.Authors;
         Publisher = book.Publisher;
         Genres = book.Genres.ToList();
-        DatePublished = DatePublished;
+        DatePublished = book.DatePublished;
     }
 }
