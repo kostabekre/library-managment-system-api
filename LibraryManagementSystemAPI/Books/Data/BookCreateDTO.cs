@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using LibraryManagementSystemAPI.Books.Data;
 
 namespace LibraryManagementSystemAPI.Models;
 
@@ -12,14 +13,15 @@ public class BookCreateDTO
     public int PublisherId { get; set; }
     public int[] GenresId { get; set; }
     public DateTime DatePublished { get; set; }
+    public IFormFile? Cover { get; set; }
 
-    public static Book Convert(BookCreateDTO dto, string? coverPath)
+    public static Book Convert(BookCreateDTO dto, byte[]? cover, string? coverName)
     {
         var book = new Book()
         {
             Name = dto.Name,
+            Cover = cover == null ? null : new BookCover(){CoverFile = cover, Name = coverName!},
             ISBN = dto.ISBN,
-            CoverPath = coverPath,
             PublisherId = dto.PublisherId,
             DatePublished = dto.DatePublished
         };

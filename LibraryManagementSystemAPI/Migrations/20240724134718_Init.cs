@@ -61,7 +61,6 @@ namespace LibraryManagementSystemAPI.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     ISBN = table.Column<string>(type: "text", nullable: false),
-                    CoverPath = table.Column<string>(type: "text", nullable: true),
                     PublisherId = table.Column<int>(type: "integer", nullable: false),
                     DatePublished = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -94,6 +93,25 @@ namespace LibraryManagementSystemAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BookAuthor_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BookCover",
+                columns: table => new
+                {
+                    BookId = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    CoverFile = table.Column<byte[]>(type: "bytea", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookCover", x => x.BookId);
+                    table.ForeignKey(
+                        name: "FK_BookCover_Books_BookId",
                         column: x => x.BookId,
                         principalTable: "Books",
                         principalColumn: "Id",
@@ -181,6 +199,9 @@ namespace LibraryManagementSystemAPI.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BookAuthor");
+
+            migrationBuilder.DropTable(
+                name: "BookCover");
 
             migrationBuilder.DropTable(
                 name: "BookGenre");

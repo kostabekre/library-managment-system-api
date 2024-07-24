@@ -39,5 +39,9 @@ public class BookContext : DbContext
         modelBuilder.Entity<BookAmount>()
             .HasKey(a => a.BookId);
 
+        modelBuilder.Entity<BookCover>()
+            .HasOne(a => a.Book);
+        modelBuilder.Entity<BookCover>()
+            .HasKey(a => a.BookId);
     }
 }

@@ -15,7 +15,9 @@ public class EfCorePublisherRepository : IPublisherRepository
 
     public async Task<Publisher?> GetPublisher(int id)
     {
-        var publisher = await _bookContext.Publishers.FirstOrDefaultAsync(p => p.Id == id);
+        var publisher = await _bookContext.Publishers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id);
         return publisher;
     }
 
@@ -43,6 +45,8 @@ public class EfCorePublisherRepository : IPublisherRepository
 
     public async Task<IEnumerable<Publisher>> GetAllPublishers()
     {
-        return await _bookContext.Publishers.ToListAsync();
+        return await _bookContext.Publishers
+            .AsNoTracking()
+            .ToListAsync();
     }
 }

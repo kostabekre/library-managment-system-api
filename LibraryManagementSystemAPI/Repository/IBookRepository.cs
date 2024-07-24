@@ -11,4 +11,6 @@ public interface IBookRepository
     Task<BookInfo?> GetBook(int id);
     Task<bool> RemoveBook(int id);
     Task<bool> UpdateBook(int id, BookUpdateDTO bookDTO);
+    Task<BookCoverDTO?> GetCover(int id);
+    Task<bool> UpdateCover(int id, IFormFile file);
 }

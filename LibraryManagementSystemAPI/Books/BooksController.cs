@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Models;
@@ -59,6 +60,35 @@ public class BooksController : ControllerBase
         return Ok(book);
     }
 
+    
+    [HttpPut]
+    [Route("cover/{id}")]
+    public async Task<ActionResult> UpdateCover(int id, IFormFile file)
+    {
+        var updated = await _bookRepository.UpdateCover(id, file);
+
+        if (updated == false)
+        {
+            return NotFound();
+        }
+
+        return Ok();
+    }
+    [HttpGet]
+    [Route("cover/{id}")]
+    public async Task<ActionResult> GetCover(int id)
+    {
+        var result = await _bookRepository.GetCover(id);
+
+        if (result == null)
+        {
+            return NotFound();
+        }
+        
+        Response.Headers.Append("Content-Disposition", result.CD.ToString());
+
+        return File(result.File, "application/jpeg");
+    }
     [HttpPost]
     public async Task<ActionResult> CreateBook(BookCreateDTO book)
     {

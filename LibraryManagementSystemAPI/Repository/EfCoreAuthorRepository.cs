@@ -16,7 +16,9 @@ public class EfCoreAuthorRepository : IAuthorRepository
 
     public async Task<Author?> GetAuthor(int id)
     {
-        return await _bookContext.Authors.FirstOrDefaultAsync(a => a.Id == id);
+        return await _bookContext.Authors
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == id);
     }
 
     public async Task<Author> CreateAuthor(Author author)
@@ -45,6 +47,8 @@ public class EfCoreAuthorRepository : IAuthorRepository
 
     public async Task<IEnumerable<Author>> GetAllAuthors()
     {
-        return await _bookContext.Authors.ToListAsync();
+        return await _bookContext.Authors
+            .AsNoTracking()
+            .ToListAsync();
     }
 }

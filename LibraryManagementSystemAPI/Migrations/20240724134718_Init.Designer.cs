@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LibraryManagementSystemAPI.Migrations
 {
     [DbContext(typeof(BookContext))]
-    [Migration("20240723092846_Init")]
+    [Migration("20240724134718_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -24,6 +24,35 @@ namespace LibraryManagementSystemAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.Book", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DatePublished")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ISBN")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("PublisherId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublisherId");
+
+                    b.ToTable("Books");
+                });
 
             modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.BookAuthor", b =>
                 {
@@ -38,6 +67,24 @@ namespace LibraryManagementSystemAPI.Migrations
                     b.HasIndex("BookId");
 
                     b.ToTable("BookAuthor");
+                });
+
+            modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.BookCover", b =>
+                {
+                    b.Property<int>("BookId")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("CoverFile")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("BookId");
+
+                    b.ToTable("BookCover");
                 });
 
             modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.BookGenre", b =>
@@ -74,38 +121,6 @@ namespace LibraryManagementSystemAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors");
-                });
-
-            modelBuilder.Entity("LibraryManagementSystemAPI.Models.Book", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CoverPath")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("DatePublished")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ISBN")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("PublisherId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PublisherId");
-
-                    b.ToTable("Books");
                 });
 
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.BookAmount", b =>
@@ -172,6 +187,17 @@ namespace LibraryManagementSystemAPI.Migrations
                     b.ToTable("Publishers");
                 });
 
+            modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.Book", b =>
+                {
+                    b.HasOne("LibraryManagementSystemAPI.Models.Publisher", "Publisher")
+                        .WithMany("Books")
+                        .HasForeignKey("PublisherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Publisher");
+                });
+
             modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.BookAuthor", b =>
                 {
                     b.HasOne("LibraryManagementSystemAPI.Models.Author", null)
@@ -180,16 +206,27 @@ namespace LibraryManagementSystemAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LibraryManagementSystemAPI.Models.Book", null)
+                    b.HasOne("LibraryManagementSystemAPI.Books.Data.Book", null)
                         .WithMany("BookAuthors")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.BookCover", b =>
+                {
+                    b.HasOne("LibraryManagementSystemAPI.Books.Data.Book", "Book")
+                        .WithOne("Cover")
+                        .HasForeignKey("LibraryManagementSystemAPI.Books.Data.BookCover", "BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+                });
+
             modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.BookGenre", b =>
                 {
-                    b.HasOne("LibraryManagementSystemAPI.Models.Book", null)
+                    b.HasOne("LibraryManagementSystemAPI.Books.Data.Book", null)
                         .WithMany("BookGenres")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -202,20 +239,9 @@ namespace LibraryManagementSystemAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LibraryManagementSystemAPI.Models.Book", b =>
-                {
-                    b.HasOne("LibraryManagementSystemAPI.Models.Publisher", "Publisher")
-                        .WithMany("Books")
-                        .HasForeignKey("PublisherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Publisher");
-                });
-
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.BookAmount", b =>
                 {
-                    b.HasOne("LibraryManagementSystemAPI.Models.Book", "Book")
+                    b.HasOne("LibraryManagementSystemAPI.Books.Data.Book", "Book")
                         .WithOne("Amount")
                         .HasForeignKey("LibraryManagementSystemAPI.Models.BookAmount", "BookId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -226,7 +252,7 @@ namespace LibraryManagementSystemAPI.Migrations
 
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.BookRating", b =>
                 {
-                    b.HasOne("LibraryManagementSystemAPI.Models.Book", "Book")
+                    b.HasOne("LibraryManagementSystemAPI.Books.Data.Book", "Book")
                         .WithOne("Rating")
                         .HasForeignKey("LibraryManagementSystemAPI.Models.BookRating", "BookId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -235,12 +261,7 @@ namespace LibraryManagementSystemAPI.Migrations
                     b.Navigation("Book");
                 });
 
-            modelBuilder.Entity("LibraryManagementSystemAPI.Models.Author", b =>
-                {
-                    b.Navigation("BookAuthors");
-                });
-
-            modelBuilder.Entity("LibraryManagementSystemAPI.Models.Book", b =>
+            modelBuilder.Entity("LibraryManagementSystemAPI.Books.Data.Book", b =>
                 {
                     b.Navigation("Amount");
 
@@ -248,7 +269,14 @@ namespace LibraryManagementSystemAPI.Migrations
 
                     b.Navigation("BookGenres");
 
+                    b.Navigation("Cover");
+
                     b.Navigation("Rating");
+                });
+
+            modelBuilder.Entity("LibraryManagementSystemAPI.Models.Author", b =>
+                {
+                    b.Navigation("BookAuthors");
                 });
 
             modelBuilder.Entity("LibraryManagementSystemAPI.Models.Genre", b =>

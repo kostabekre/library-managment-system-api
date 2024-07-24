@@ -1,5 +1,6 @@
 using LibraryManagementSystemAPI.Context;
 using LibraryManagementSystemAPI.Controllers;
+using LibraryManagementSystemAPI.CoverValidation;
 using LibraryManagementSystemAPI.Models;
 using LibraryManagementSystemAPI.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ builder.Services.AddDbContext<BookContext>(options =>
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Services.AddRepositories();
+builder.Services.AddScoped<ICoverValidation, DefaultCoverValidation>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();

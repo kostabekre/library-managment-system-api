@@ -22,11 +22,15 @@ public class EfCoreGenreRepository : IGenreRepository
 
     public async Task<Genre?> GetGenre(int id)
     {
-        var genre = await _bookContext.Genres.FirstOrDefaultAsync(g => g.Id == id);
+        var genre = await _bookContext.Genres
+            .AsNoTracking()
+            .FirstOrDefaultAsync(g => g.Id == id);
         return genre;
     }
 
-    public async Task<IEnumerable<Genre>> GetAllGenre() => await _bookContext.Genres.ToListAsync();
+    public async Task<IEnumerable<Genre>> GetAllGenre() => await _bookContext.Genres
+        .AsNoTracking()
+        .ToListAsync();
 
     public async Task<bool> RemoveGenre(int id)
     {
