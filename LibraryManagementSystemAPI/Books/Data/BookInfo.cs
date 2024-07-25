@@ -10,7 +10,7 @@ public class BookInfo
     public IEnumerable<Author>? Authors { get; set; }
     public Publisher? Publisher { get; set; }
     public IEnumerable<Genre>? Genres { get; set; }
-    public int BooksRating { get; set; }
+    public int BookRating { get; set; }
     public int BookAmount { get; set; }
     public DateTime DatePublished { get; set; }
 
@@ -25,5 +25,7 @@ public class BookInfo
         Publisher = book.Publisher;
         Genres = book.Genres.ToList();
         DatePublished = book.DatePublished;
+        BookRating = book.Rating?.Rating ?? 0;
+        BookAmount = book.Amount?.Amount ?? 0;
     }
 }

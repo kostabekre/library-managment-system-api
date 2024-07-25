@@ -60,43 +60,31 @@ public class BooksController : ControllerBase
         return Ok(book);
     }
 
-    
-    [HttpPut]
-    [Route("cover/{id}")]
-    public async Task<ActionResult> UpdateCover(int id, IFormFile file)
-    {
-        var updated = await _bookRepository.UpdateCover(id, file);
-
-        if (updated == false)
-        {
-            return NotFound();
-        }
-
-        return Ok();
-    }
-    [HttpGet]
-    [Route("cover/{id}")]
-    public async Task<ActionResult> GetCover(int id)
-    {
-        var result = await _bookRepository.GetCover(id);
-
-        if (result == null)
-        {
-            return NotFound();
-        }
-        
-        Response.Headers.Append("Content-Disposition", result.CD.ToString());
-
-        return File(result.File, "application/jpeg");
-    }
     [HttpPost]
-    public async Task<ActionResult> CreateBook(BookCreateDTO book)
+    public async Task<ActionResult> CreateBook(BookCreateDTO bookDto)
+    {
+        int createdId;
+        try
+        {
+            createdId = await _bookRepository.CreateBook(bookDto);
+        }
+        catch (DbUpdateException e)
+        {
+            return BadRequest();
+        }
+
+        return CreatedAtAction(nameof(GetBook), new { Id = createdId }, createdId);
+    }
+    
+    [HttpPost]
+    [Route("cover")]
+    public async Task<ActionResult> CreateBookWithCover(BookWithCoverCreateDto bookWithCover)
     {
 
         int createdId;
         try
         {
-            createdId = await _bookRepository.CreateBook(book);
+            createdId = await _bookRepository.CreateBookWithCover(bookWithCover);
         }
         catch (DbUpdateException e)
         {
@@ -125,6 +113,31 @@ public class BooksController : ControllerBase
     {
         bool deleted = await _bookRepository.RemoveBook(id);
         if (!deleted)
+        {
+            return NotFound();
+        }
+
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("amount/{id}")]
+    public async Task<ActionResult> UpdateBookAmount(int id, [FromForm]int amount)
+    {
+        bool updated = await _bookRepository.UpdateBookAmount(id, amount);
+        if (updated == false)
+        {
+            return NotFound();
+        }
+
+        return Ok();
+    }
+    [HttpPost]
+    [Route("rating/{id}")]
+    public async Task<ActionResult> UpdateBookRating(int id, [FromForm]int rating)
+    {
+        bool updated = await _bookRepository.UpdateBookRating(id, rating);
+        if (updated == false)
         {
             return NotFound();
         }

@@ -42,9 +42,22 @@ public class EfCoreBookRepository : IBookRepository
 
     public async Task<int> CreateBook(BookCreateDTO dto)
     {
+        var book = BookCreateDTO.Convert(dto);
+
+        var bookId = await SaveBook(dto, book);
+        return bookId;
+    }
+    public async Task<int> CreateBookWithCover(BookWithCoverCreateDto dto)
+    {
         var isCoverValid = _coverValidation.IsFileValid(dto.Cover);
         
-        var book = BookCreateDTO.Convert(dto, isCoverValid.Result, isCoverValid.Name);
+        var book = BookWithCoverCreateDto.Convert(dto, isCoverValid.Result, isCoverValid.Name);
+
+        return await SaveBook(dto.MainInfo, book);
+    }
+
+    private async Task<int> SaveBook(BookCreateDTO dto, Book book)
+    {
         _bookContext.Books.Add(book);
         await _bookContext.SaveChangesAsync();
 
@@ -71,6 +84,7 @@ public class EfCoreBookRepository : IBookRepository
         return book.Id;
     }
 
+
     public async Task<BookInfo?> GetBook(int id)
     {
         var book = await _bookContext.Books
@@ -78,6 +92,8 @@ public class EfCoreBookRepository : IBookRepository
             .Include(b => b.Authors)
             .Include(b => b.Publisher)
             .Include(b => b.Genres)
+            .Include(b =>b.Amount)
+            .Include(b =>b.Rating)
             .FirstOrDefaultAsync(b => b.Id == id);
         if (book == null)
         {
@@ -154,5 +170,23 @@ public class EfCoreBookRepository : IBookRepository
                 .SetProperty(c => c.BookId, id));
             
         return true;
+    }
+
+    public async Task<bool> UpdateBookRating(int id, int rating)
+    {
+        int rowsUpdated = await _bookContext.Set<BookRating>()
+            .Where(r => r.BookId == id)
+            .ExecuteUpdateAsync(parameters =>
+                parameters.SetProperty(r => r.Rating, rating));
+        return rowsUpdated > 0;
+    }
+
+    public async Task<bool> UpdateBookAmount(int id, int amount)
+    {
+        int rowsUpdated = await _bookContext.Set<BookAmount>()
+            .Where(r => r.BookId == id)
+            .ExecuteUpdateAsync(parameters =>
+                parameters.SetProperty(r => r.Amount, amount));
+        return rowsUpdated > 0;
     }
 }

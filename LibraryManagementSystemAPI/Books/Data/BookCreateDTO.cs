@@ -12,18 +12,20 @@ public class BookCreateDTO
     public int[] AuthorsId { get; set; }
     public int PublisherId { get; set; }
     public int[] GenresId { get; set; }
+    public int BookAmount { get; set; }
+    public int BookRating { get; set; }
     public DateTime DatePublished { get; set; }
-    public IFormFile? Cover { get; set; }
-
-    public static Book Convert(BookCreateDTO dto, byte[]? cover, string? coverName)
+    
+    public static Book Convert(BookCreateDTO dto)
     {
         var book = new Book()
         {
             Name = dto.Name,
-            Cover = cover == null ? null : new BookCover(){CoverFile = cover, Name = coverName!},
             ISBN = dto.ISBN,
             PublisherId = dto.PublisherId,
-            DatePublished = dto.DatePublished
+            DatePublished = dto.DatePublished,
+            Amount = new BookAmount(){Amount = dto.BookAmount},
+            Rating = new BookRating(){Rating = dto.BookRating},
         };
 
         return book;
