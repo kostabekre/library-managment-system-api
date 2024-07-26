@@ -1,10 +1,12 @@
+using LibraryManagementSystemAPI.Publisher.Data;
+
 namespace LibraryManagementSystemAPI.Publisher;
 
 public interface IPublisherRepository
 {
-    Task<Publisher?> GetPublisher(int id);
-    Task CreatePublisher(Publisher author);
-    Task<bool> UpdatePublisher(int id, Publisher publisher);
+    Task<PublisherFullInfo?> GetPublisher(int id);
+    Task<PublisherFullInfo> CreatePublisher(PublisherInfo author);
+    Task<bool> UpdatePublisher(int id, PublisherInfo info);
     Task<bool> DeletePublisher(int id);
-    Task<IEnumerable<Publisher>> GetAllPublishers();
+    Task<IEnumerable<PublisherFullInfo>> GetAllPublishers();
 }

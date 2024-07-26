@@ -24,17 +24,17 @@ public class DbSeed
 
         if (!_bookContext.Genres.Any())
         {
-            _bookContext.Genres.Add(new Genre.Genre() { Name = "Fantasy" });
-            _bookContext.Genres.Add(new Genre.Genre() { Name = "Horror" });
-            _bookContext.Genres.Add(new Genre.Genre() { Name = "Bugi vugi" });
+            _bookContext.Genres.Add(new Genre.Data.Genre() { Name = "Fantasy" });
+            _bookContext.Genres.Add(new Genre.Data.Genre() { Name = "Horror" });
+            _bookContext.Genres.Add(new Genre.Data.Genre() { Name = "Bugi vugi" });
         }
 
         if (!_bookContext.Publishers.Any())
         {
-            _bookContext.Publishers.Add(new Publisher.Publisher(){Address = "Bb8", Name = "Holly ground"});
-            _bookContext.Publishers.Add(new Publisher.Publisher(){Address = "Transilvania", Name = "Vampire streets"});
-            _bookContext.Publishers.Add(new Publisher.Publisher(){Address = "Cave", Name = "Hungry monkeys"});
-            _bookContext.Publishers.Add(new Publisher.Publisher(){Address = "London", Name = "London times"});
+            _bookContext.Publishers.Add(new Publisher.Data.Publisher(){Address = "Bb8", Name = "Holly ground"});
+            _bookContext.Publishers.Add(new Publisher.Data.Publisher(){Address = "Transilvania", Name = "Vampire streets"});
+            _bookContext.Publishers.Add(new Publisher.Data.Publisher(){Address = "Cave", Name = "Hungry monkeys"});
+            _bookContext.Publishers.Add(new Publisher.Data.Publisher(){Address = "London", Name = "London times"});
         }
 
         _bookContext.SaveChanges();

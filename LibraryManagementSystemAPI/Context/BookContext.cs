@@ -12,8 +12,8 @@ public class BookContext : DbContext
     
     public DbSet<Book> Books { get; init; }
     public DbSet<Author> Authors { get; init; }
-    public DbSet<Genre.Genre> Genres { get; init; }
-    public DbSet<Publisher.Publisher> Publishers { get; init; }
+    public DbSet<Genre.Data.Genre> Genres { get; init; }
+    public DbSet<Publisher.Data.Publisher> Publishers { get; init; }
     public DbSet<BookRating> BooksRating { get; init; }
     public DbSet<BookAmount> BooksAmount { get; init; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -4,9 +4,9 @@ namespace LibraryManagementSystemAPI.Authors;
 
 public interface IAuthorRepository
 {
-    Task<Author?> GetAuthor(int id);
-    Task<Author> CreateAuthor(Author author);
+    Task<AuthorFullInfo?> GetAuthor(int id);
+    Task<AuthorFullInfo> CreateAuthor(AuthorInfo info);
     Task<bool> DeleteAuthor(int id);
-    Task<bool> UpdateAuthor(int id, Author author);
-    Task<IEnumerable<Author>> GetAllAuthors();
+    Task<bool> UpdateAuthor(int id, AuthorInfo author);
+    Task<IEnumerable<AuthorFullInfo>> GetAllAuthors();
 }

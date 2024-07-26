@@ -15,17 +15,17 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Author>>> GetAllAuthors()
+    public async Task<ActionResult<IEnumerable<AuthorFullInfo>>> GetAllAuthors()
     {
-        IEnumerable<Author> author = await _authorRepository.GetAllAuthors();
-        return Ok(author);
+        IEnumerable<AuthorFullInfo> authors = await _authorRepository.GetAllAuthors();
+        return Ok(authors);
     }
     
     [HttpGet]
     [Route("{id}")]
-    public async Task<ActionResult<Author>> GetAuthor(int id)
+    public async Task<ActionResult<AuthorFullInfo>> GetAuthor(int id)
     {
-        Author? author = await _authorRepository.GetAuthor(id);
+        AuthorFullInfo? author = await _authorRepository.GetAuthor(id);
         if (author == null)
         {
             return NotFound();
@@ -34,15 +34,15 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Author>> CreateAuthor(Author author)
+    public async Task<ActionResult<AuthorFullInfo>> CreateAuthor(AuthorInfo author)
     {
-        await _authorRepository.CreateAuthor(author);
-        return CreatedAtAction(nameof(GetAuthor), new {author.Id}, author);
+        var fullInfo = await _authorRepository.CreateAuthor(author);
+        return CreatedAtAction(nameof(GetAuthor), new {fullInfo.Id}, fullInfo);
     }
 
     [HttpPut]
     [Route("{id}")]
-    public async Task<ActionResult<Author>> UpdateAuthor(int id, Author author)
+    public async Task<ActionResult> UpdateAuthor(int id, AuthorInfo author)
     {
         bool updated = await _authorRepository.UpdateAuthor(id, author);
         if (updated == false)
@@ -50,7 +50,7 @@ public class AuthorsController : ControllerBase
             return NotFound();
         }
 
-        return author;
+        return Ok();
     }
     
 

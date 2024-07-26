@@ -1,9 +1,11 @@
+using LibraryManagementSystemAPI.Genre.Data;
+
 namespace LibraryManagementSystemAPI.Genre;
 
 public interface IGenreRepository
 {
-    Task CreateGenre(Genre genre);
-    Task<Genre?> GetGenre(int id);
-    Task<IEnumerable<Genre>> GetAllGenre();
+    Task<GenreFullInfo> CreateGenre(GenreInfo info);
+    Task<GenreFullInfo?> GetGenre(int id);
+    Task<IEnumerable<GenreFullInfo>> GetAllGenre();
     Task<bool> RemoveGenre(int id);
 }

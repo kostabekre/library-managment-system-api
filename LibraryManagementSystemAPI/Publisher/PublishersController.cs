@@ -1,3 +1,4 @@
+using LibraryManagementSystemAPI.Publisher.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystemAPI.Publisher;
@@ -14,17 +15,17 @@ public class PublishersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<Publisher>> GetAllPublishers()
+    public async Task<ActionResult<PublisherFullInfo>> GetAllPublishers()
     {
-        IEnumerable<Publisher> publishers = await _publisherRepository.GetAllPublishers();
+        IEnumerable<PublisherFullInfo> publishers = await _publisherRepository.GetAllPublishers();
         return Ok(publishers);
     }
     
     [HttpGet]
     [Route("{id}")]
-    public async Task<ActionResult<Publisher>> GetPublisher(int id)
+    public async Task<ActionResult<PublisherFullInfo>> GetPublisher(int id)
     {
-        Publisher? publisher = await _publisherRepository.GetPublisher(id);
+        PublisherFullInfo? publisher = await _publisherRepository.GetPublisher(id);
         if (publisher == null)
         {
             return NotFound();
@@ -33,15 +34,15 @@ public class PublishersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Publisher>> CreatePublisher(Publisher publisher)
+    public async Task<ActionResult<PublisherFullInfo>> CreatePublisher(PublisherInfo info)
     {
-        await _publisherRepository.CreatePublisher(publisher);
-        return CreatedAtAction(nameof(GetPublisher), new {publisher.Id}, publisher);
+        var fullInfo =  await _publisherRepository.CreatePublisher(info);
+        return CreatedAtAction(nameof(GetPublisher), new {fullInfo.Id}, fullInfo);
     }
 
     [HttpPut]
     [Route("{id}")]
-    public async Task<ActionResult<Publisher>> UpdateAuthor(int id, Publisher publisher)
+    public async Task<ActionResult> UpdateAuthor(int id, PublisherInfo publisher)
     {
         bool updated = await _publisherRepository.UpdatePublisher(id, publisher);
         if (updated == false)
@@ -49,7 +50,7 @@ public class PublishersController : ControllerBase
             return NotFound();
         }
 
-        return publisher;
+        return Ok();
     }
     
 
