@@ -20,11 +20,11 @@ public class BooksCoverController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult> UpdateCover(int id, IFormFile file)
     {
-        var updated = await _bookRepository.UpdateCover(id, file);
+        var error = await _bookRepository.UpdateCover(id, file);
 
-        if (updated == false)
+        if (error != null)
         {
-            return NotFound();
+            return StatusCode(error.Code, error.Message);
         }
 
         return Ok();

@@ -15,6 +15,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Services.AddRepositories();
 builder.Services.AddScoped<ICoverValidation, DefaultCoverValidation>();
+builder.Services.AddCoverValidationValues(builder);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();

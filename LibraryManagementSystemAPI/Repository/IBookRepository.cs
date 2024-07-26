@@ -13,7 +13,7 @@ public interface IBookRepository
     Task<bool> RemoveBook(int id);
     Task<bool> UpdateBook(int id, BookUpdateDTO bookDTO);
     Task<BookCoverDTO?> GetCover(int id);
-    Task<bool> UpdateCover(int id, IFormFile file);
-    Task<bool> UpdateBookRating(int id, int rating);
-    Task<bool> UpdateBookAmount(int id, int amount);
+    Task<Error?> UpdateCover(int id, IFormFile file);
+    Task<Error?> UpdateBookRating(int id, int rating);
+    Task<Error?> UpdateBookAmount(int id, int amount);
 }

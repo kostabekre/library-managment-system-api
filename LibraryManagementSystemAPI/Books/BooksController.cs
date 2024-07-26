@@ -80,7 +80,6 @@ public class BooksController : ControllerBase
     [Route("cover")]
     public async Task<ActionResult> CreateBookWithCover(BookWithCoverCreateDto bookWithCover)
     {
-
         int createdId;
         try
         {
@@ -124,8 +123,8 @@ public class BooksController : ControllerBase
     [Route("amount/{id}")]
     public async Task<ActionResult> UpdateBookAmount(int id, [FromForm]int amount)
     {
-        bool updated = await _bookRepository.UpdateBookAmount(id, amount);
-        if (updated == false)
+        var error = await _bookRepository.UpdateBookAmount(id, amount);
+        if (error != null)
         {
             return NotFound();
         }
@@ -136,8 +135,8 @@ public class BooksController : ControllerBase
     [Route("rating/{id}")]
     public async Task<ActionResult> UpdateBookRating(int id, [FromForm]int rating)
     {
-        bool updated = await _bookRepository.UpdateBookRating(id, rating);
-        if (updated == false)
+        var error = await _bookRepository.UpdateBookRating(id, rating);
+        if (error != null)
         {
             return NotFound();
         }

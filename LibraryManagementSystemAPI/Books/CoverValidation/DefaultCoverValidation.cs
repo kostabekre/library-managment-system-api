@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+
 namespace LibraryManagementSystemAPI.CoverValidation;
 
 public class DefaultCoverValidation : ICoverValidation
@@ -6,13 +8,6 @@ public class DefaultCoverValidation : ICoverValidation
     private static readonly Dictionary<string, List<byte[]>> _fileSignature = 
         new Dictionary<string, List<byte[]>>
     {
-        { ".jpeg", new List<byte[]>
-            {
-                new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 },
-                new byte[] { 0xFF, 0xD8, 0xFF, 0xE2 },
-                new byte[] { 0xFF, 0xD8, 0xFF, 0xE3 },
-            }
-        },
         { ".jpg", new List<byte[]>
             {
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 },
@@ -28,20 +23,23 @@ public class DefaultCoverValidation : ICoverValidation
         }
     };
     
-    private const int FileSizeBytes = 2097152;
+    private readonly CoverValidationValues _validationValues;
 
-    private bool IsValidSignature(string extension, BinaryReader reader, Stream stream)
+    public DefaultCoverValidation(IOptions<CoverValidationValues> validationValues)
     {
-        stream.Position = 0;
+        _validationValues = validationValues.Value;
+    }
+
+    private bool IsValidSignature(string extension, byte[] fileBytes)
+    {
         var signatures = _fileSignature[extension];
-        var headerBytes = reader.ReadBytes(signatures.Max(m => m.Length));
 
         return signatures.Any(signature => 
-            headerBytes.Take(signature.Length).SequenceEqual(signature));
+            fileBytes.Take(signature.Length).SequenceEqual(signature));
     }
     public CoverValidationResult IsFileValid(IFormFile? file)
     {
-        if (file.Length > FileSizeBytes)
+        if (file.Length > _validationValues.MaxSize)
         {
             return new CoverValidationResult() { IsValid = false, Message = "File cannot be more than 2 MB!" };
         }
@@ -49,33 +47,36 @@ public class DefaultCoverValidation : ICoverValidation
         var extension = Path.GetExtension(file.FileName);
         if (!_fileExtensions.Contains(extension))
         {
-            return new CoverValidationResult() { IsValid = false, Message = "File is doesn't have valid extension" };
+            return new CoverValidationResult() { IsValid = false, Message = "File doesn't have valid extension" };
         }
 
-        using (var openReadStream = file.OpenReadStream())
+        byte[] readenBytes;
+        
+        using (Stream openReadStream = file.OpenReadStream())
         {
-            using (var reader = new BinaryReader(openReadStream))
+            using (var memoryStream = new MemoryStream())
             {
-                bool isValid = false;
-                isValid = IsValidSignature(".jpg", reader, openReadStream);
-                if (!isValid)
-                {
-                    isValid = IsValidSignature(".png", reader, openReadStream);
-                    if (!isValid)
-                    {
-                        return new CoverValidationResult() { IsValid = false, Message = "File is not an image!" };
-                    }
-                }
-
-                openReadStream.Position = 0;
-                using (var memoryStream = new MemoryStream())
-                {
-                    openReadStream.CopyTo(memoryStream);
-                    var result = memoryStream.ToArray();
-                    return new CoverValidationResult() { IsValid = true, Message = "File is valid", Result = result, Name = $"{Guid.NewGuid()}.jpg"};
-                }
+                openReadStream.CopyTo(memoryStream);
+                readenBytes = memoryStream.ToArray();
             }
         }
+        
+        bool isValid = false;
+        foreach (var signatureKey in _fileSignature.Keys)
+        {
+            isValid = IsValidSignature(signatureKey, readenBytes);
+            if (isValid)
+            {
+                break;
+            }
+        }
+
+        if (isValid == false)
+        {
+            return new CoverValidationResult() { IsValid = false, Message = "File is not an image!" };
+        }
+
+        return new CoverValidationResult() { IsValid = true, Message = "File is valid", Result = readenBytes, Name = $"{Guid.NewGuid()}.jpg"};
         
     }
 }

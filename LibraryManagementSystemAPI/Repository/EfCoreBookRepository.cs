@@ -59,6 +59,7 @@ public class EfCoreBookRepository : IBookRepository
     private async Task<int> SaveBook(BookCreateDTO dto, Book book)
     {
         _bookContext.Books.Add(book);
+        
         await _bookContext.SaveChangesAsync();
 
         var bookAuthors = new List<BookAuthor>();
@@ -152,41 +153,90 @@ public class EfCoreBookRepository : IBookRepository
         return new BookCoverDTO(){CD = cd, File = cover.CoverFile};
     }
 
-    public async Task<bool> UpdateCover(int id, IFormFile file)
+    public async Task<Error?> UpdateCover(int id, IFormFile file)
     {
         var isCoverValid = _coverValidation.IsFileValid(file);
         if (!isCoverValid.IsValid)
         {
-            return false;
+            return new Error(400, isCoverValid.Message);
         }
 
         string newName = $"{Guid.NewGuid()}.jpg";
 
-        await _bookContext.Set<BookCover>()
+        var rowsUpdated = await _bookContext.Set<BookCover>()
             .Where(c => c.BookId == id)
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(c => c.Name, newName)
                 .SetProperty(c => c.CoverFile, isCoverValid.Result)
                 .SetProperty(c => c.BookId, id));
-            
-        return true;
+
+        if (rowsUpdated > 0)
+        {
+            return null;
+        }
+
+        var bookCover = new BookCover() { BookId = id,  CoverFile = isCoverValid.Result!, Name = newName  };
+        _bookContext.Set<BookCover>().Add(bookCover);
+        try
+        {
+            await _bookContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException e)
+        {
+            return new Error(404, "Not Founded");
+        }
+
+        return null;
     }
 
-    public async Task<bool> UpdateBookRating(int id, int rating)
+    public async Task<Error?> UpdateBookRating(int id, int rating)
     {
         int rowsUpdated = await _bookContext.Set<BookRating>()
             .Where(r => r.BookId == id)
             .ExecuteUpdateAsync(parameters =>
                 parameters.SetProperty(r => r.Rating, rating));
-        return rowsUpdated > 0;
+
+        if (rowsUpdated > 0)
+        {
+            return null;
+        }
+        
+        var bookRating = new BookRating() { BookId = id,  Rating = rating };
+        _bookContext.Set<BookRating>().Add(bookRating);
+        try
+        {
+            await _bookContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException e)
+        {
+            return new Error(404, "Not Founded");
+        }
+
+        return null;
     }
 
-    public async Task<bool> UpdateBookAmount(int id, int amount)
+    public async Task<Error?> UpdateBookAmount(int id, int amount)
     {
         int rowsUpdated = await _bookContext.Set<BookAmount>()
             .Where(r => r.BookId == id)
             .ExecuteUpdateAsync(parameters =>
                 parameters.SetProperty(r => r.Amount, amount));
-        return rowsUpdated > 0;
+        if (rowsUpdated > 0)
+        {
+            return null;
+        }
+        
+        var bookAmount = new BookAmount() { BookId = id,  Amount = amount};
+        _bookContext.Set<BookAmount>().Add(bookAmount);
+        try
+        {
+            await _bookContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException e)
+        {
+            return new Error(404, "Not Founded");
+        }
+
+        return null;
     }
 }
