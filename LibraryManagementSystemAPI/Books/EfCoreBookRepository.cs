@@ -41,9 +41,9 @@ public class EfCoreBookRepository : IBookRepository
         return new PagedList<IList<BookShortInfo>>(result, parameters.PageSize, parameters.PageNumber, result.Count);
     }
 
-    public async Task<int> CreateBook(BookCreateDTO dto)
+    public async Task<int> CreateBook(BookCreateDto dto)
     {
-        var book = BookCreateDTO.Convert(dto);
+        var book = BookCreateDto.Convert(dto);
 
         var bookId = await SaveBook(dto, book);
         return bookId;
@@ -54,10 +54,10 @@ public class EfCoreBookRepository : IBookRepository
         
         var book = BookWithCoverCreateDto.Convert(dto, isCoverValid.Result, isCoverValid.Name);
 
-        return await SaveBook(dto.MainInfo, book);
+        return await SaveBook(dto.Details, book);
     }
 
-    private async Task<int> SaveBook(BookCreateDTO dto, Book book)
+    private async Task<int> SaveBook(BookCreateDto dto, Book book)
     {
         _bookContext.Books.Add(book);
         
@@ -110,7 +110,7 @@ public class EfCoreBookRepository : IBookRepository
         return rowsDeleted > 0;
     }
 
-    public async Task<bool> UpdateBook(int id, BookUpdateDTO bookDto)
+    public async Task<bool> UpdateBook(int id, BookUpdateDto bookDto)
     {
         var book = _bookContext.Books.Include(b => b.BookGenres).FirstOrDefault(b => b.Id == id);
         if (book == null)
@@ -122,10 +122,9 @@ public class EfCoreBookRepository : IBookRepository
         
         if (book.BookGenres != null)
         {
-            var bookGenres = book.BookGenres.ToList();
-            bookGenres.Clear();
+            book.BookGenres.ToList().Clear();
         }
-
+        
         book.BookGenres = bookDto.GenresId.Select(genreId => new BookGenre() { BookId = id, GenreId = genreId}).ToList();
 
         await _bookContext.SaveChangesAsync();

@@ -2,10 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LibraryManagementSystemAPI.Books.Data;
 
-public class BookUpdateDTO
+public class BookUpdateDto
 {
-    public int Id { get; set; }
-    [MaxLength(100)]
-    public string Name { get; set; }
-    public int[] GenresId { get; set; }
+    [MaxLength(100)] public string Name { get; set; } = null!;
+    public int[] GenresId { get; set; } = null!;
 }

@@ -1,7 +1,6 @@
 using System.Text.Json;
 using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Data;
-using LibraryManagementSystemAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,7 +60,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateBook(BookCreateDTO bookDto)
+    public async Task<ActionResult> CreateBook(BookCreateDto bookDto)
     {
         int createdId;
         try
@@ -95,7 +94,7 @@ public class BooksController : ControllerBase
 
     [HttpPut]
     [Route("{id}")]
-    public async Task<ActionResult<BookInfo>> UpdateBook(int id, BookUpdateDTO book)
+    public async Task<ActionResult<BookInfo>> UpdateBook(int id, BookUpdateDto book)
     {
         bool updated = await _bookRepository.UpdateBook(id, book);
         if (!updated)
@@ -119,7 +118,7 @@ public class BooksController : ControllerBase
         return Ok();
     }
 
-    [HttpPost]
+    [HttpPut]
     [Route("amount/{id}")]
     public async Task<ActionResult> UpdateBookAmount(int id, [FromForm]int amount)
     {
@@ -131,7 +130,8 @@ public class BooksController : ControllerBase
 
         return Ok();
     }
-    [HttpPost]
+    
+    [HttpPut]
     [Route("rating/{id}")]
     public async Task<ActionResult> UpdateBookRating(int id, [FromForm]int rating)
     {
