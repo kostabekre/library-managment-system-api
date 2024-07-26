@@ -1,6 +1,4 @@
-using LibraryManagementSystemAPI.Models;
-
-namespace LibraryManagementSystemAPI.Repository;
+namespace LibraryManagementSystemAPI.Publisher;
 
 public interface IPublisherRepository
 {

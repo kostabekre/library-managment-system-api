@@ -1,6 +1,4 @@
-using LibraryManagementSystemAPI.Models;
-
-namespace LibraryManagementSystemAPI.Controllers;
+namespace LibraryManagementSystemAPI.Genre;
 
 public interface IGenreRepository
 {

@@ -1,9 +1,7 @@
 using LibraryManagementSystemAPI.Context;
-using LibraryManagementSystemAPI.Controllers;
-using LibraryManagementSystemAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibraryManagementSystemAPI.Repository;
+namespace LibraryManagementSystemAPI.Genre;
 
 public class EfCoreGenreRepository : IGenreRepository
 {

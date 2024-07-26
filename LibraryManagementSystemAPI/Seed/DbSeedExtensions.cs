@@ -1,4 +1,4 @@
-namespace LibraryManagementSystemAPI.Models;
+namespace LibraryManagementSystemAPI.Seed;
 
 public static class DbSeedExtensions
 {

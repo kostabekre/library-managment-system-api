@@ -1,9 +1,8 @@
+using LibraryManagementSystemAPI.Authors.Models;
 using LibraryManagementSystemAPI.Context;
-using LibraryManagementSystemAPI.Controllers;
-using LibraryManagementSystemAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibraryManagementSystemAPI.Repository;
+namespace LibraryManagementSystemAPI.Authors;
 
 public class EfCoreAuthorRepository : IAuthorRepository
 {

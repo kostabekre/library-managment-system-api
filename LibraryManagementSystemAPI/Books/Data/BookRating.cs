@@ -1,6 +1,4 @@
-using LibraryManagementSystemAPI.Books.Data;
-
-namespace LibraryManagementSystemAPI.Models;
+namespace LibraryManagementSystemAPI.Books.Data;
 
 public class BookRating
 {

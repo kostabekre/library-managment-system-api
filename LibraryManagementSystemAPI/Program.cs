@@ -1,8 +1,8 @@
+using LibraryManagementSystemAPI.Books.CoverValidation;
 using LibraryManagementSystemAPI.Context;
-using LibraryManagementSystemAPI.Controllers;
-using LibraryManagementSystemAPI.CoverValidation;
 using LibraryManagementSystemAPI.Models;
 using LibraryManagementSystemAPI.Repository;
+using LibraryManagementSystemAPI.Seed;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

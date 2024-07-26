@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using LibraryManagementSystemAPI.Books.Data;
+using LibraryManagementSystemAPI.Models;
 
-namespace LibraryManagementSystemAPI.Models;
+namespace LibraryManagementSystemAPI.Books.Data;
 
 public class BookCreateDTO
 {

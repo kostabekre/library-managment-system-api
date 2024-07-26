@@ -1,4 +1,4 @@
-namespace LibraryManagementSystemAPI;
+namespace LibraryManagementSystemAPI.Books.Data;
 
 public class BookParameters
 {

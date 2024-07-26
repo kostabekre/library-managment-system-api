@@ -1,4 +1,4 @@
-namespace LibraryManagementSystemAPI.CoverValidation;
+namespace LibraryManagementSystemAPI.Books.CoverValidation;
 
 public interface ICoverValidation
 {

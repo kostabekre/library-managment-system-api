@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace LibraryManagementSystemAPI;
+namespace LibraryManagementSystemAPI.Books;
 
 [ApiController]
 [Route("api/books/cover")]

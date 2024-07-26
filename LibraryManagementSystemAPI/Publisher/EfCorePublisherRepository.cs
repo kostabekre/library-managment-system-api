@@ -1,8 +1,7 @@
 using LibraryManagementSystemAPI.Context;
-using LibraryManagementSystemAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibraryManagementSystemAPI.Repository;
+namespace LibraryManagementSystemAPI.Publisher;
 
 public class EfCorePublisherRepository : IPublisherRepository
 {

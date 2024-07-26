@@ -1,6 +1,7 @@
+using LibraryManagementSystemAPI.Authors.Models;
 using LibraryManagementSystemAPI.Context;
 
-namespace LibraryManagementSystemAPI.Models;
+namespace LibraryManagementSystemAPI.Seed;
 
 public class DbSeed
 {
@@ -23,17 +24,17 @@ public class DbSeed
 
         if (!_bookContext.Genres.Any())
         {
-            _bookContext.Genres.Add(new Genre() { Name = "Fantasy" });
-            _bookContext.Genres.Add(new Genre() { Name = "Horror" });
-            _bookContext.Genres.Add(new Genre() { Name = "Bugi vugi" });
+            _bookContext.Genres.Add(new Genre.Genre() { Name = "Fantasy" });
+            _bookContext.Genres.Add(new Genre.Genre() { Name = "Horror" });
+            _bookContext.Genres.Add(new Genre.Genre() { Name = "Bugi vugi" });
         }
 
         if (!_bookContext.Publishers.Any())
         {
-            _bookContext.Publishers.Add(new Publisher(){Address = "Bb8", Name = "Holly ground"});
-            _bookContext.Publishers.Add(new Publisher(){Address = "Transilvania", Name = "Vampire streets"});
-            _bookContext.Publishers.Add(new Publisher(){Address = "Cave", Name = "Hungry monkeys"});
-            _bookContext.Publishers.Add(new Publisher(){Address = "London", Name = "London times"});
+            _bookContext.Publishers.Add(new Publisher.Publisher(){Address = "Bb8", Name = "Holly ground"});
+            _bookContext.Publishers.Add(new Publisher.Publisher(){Address = "Transilvania", Name = "Vampire streets"});
+            _bookContext.Publishers.Add(new Publisher.Publisher(){Address = "Cave", Name = "Hungry monkeys"});
+            _bookContext.Publishers.Add(new Publisher.Publisher(){Address = "London", Name = "London times"});
         }
 
         _bookContext.SaveChanges();

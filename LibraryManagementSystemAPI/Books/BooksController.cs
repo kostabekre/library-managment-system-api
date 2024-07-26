@@ -1,11 +1,10 @@
-using System.Net;
 using System.Text.Json;
 using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibraryManagementSystemAPI;
+namespace LibraryManagementSystemAPI.Books;
 
 [ApiController]
 [Route("api/[controller]")]

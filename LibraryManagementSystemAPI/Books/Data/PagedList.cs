@@ -1,4 +1,4 @@
-namespace LibraryManagementSystemAPI;
+namespace LibraryManagementSystemAPI.Books.Data;
 
 public sealed class PagedList<T> : List<T>
 {

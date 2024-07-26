@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 
-namespace LibraryManagementSystemAPI.CoverValidation;
+namespace LibraryManagementSystemAPI.Books.CoverValidation;
 
 public class DefaultCoverValidation : ICoverValidation
 {

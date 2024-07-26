@@ -1,11 +1,11 @@
 using System.Net.Mime;
+using LibraryManagementSystemAPI.Books.CoverValidation;
 using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Context;
-using LibraryManagementSystemAPI.CoverValidation;
 using LibraryManagementSystemAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibraryManagementSystemAPI.Repository;
+namespace LibraryManagementSystemAPI.Books;
 
 public class EfCoreBookRepository : IBookRepository
 {

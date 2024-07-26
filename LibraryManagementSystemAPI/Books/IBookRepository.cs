@@ -1,7 +1,7 @@
 using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Models;
 
-namespace LibraryManagementSystemAPI;
+namespace LibraryManagementSystemAPI.Books;
 
 public interface IBookRepository
 {

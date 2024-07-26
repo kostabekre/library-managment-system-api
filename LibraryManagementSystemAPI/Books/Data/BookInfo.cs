@@ -1,3 +1,4 @@
+using LibraryManagementSystemAPI.Authors.Models;
 using LibraryManagementSystemAPI.Models;
 
 namespace LibraryManagementSystemAPI.Books.Data;
@@ -8,8 +9,8 @@ public class BookInfo
     public string Name { get; set; }
     public string ISBN { get; set; }
     public IEnumerable<Author>? Authors { get; set; }
-    public Publisher? Publisher { get; set; }
-    public IEnumerable<Genre>? Genres { get; set; }
+    public Publisher.Publisher? Publisher { get; set; }
+    public IEnumerable<Genre.Genre>? Genres { get; set; }
     public int BookRating { get; set; }
     public int BookAmount { get; set; }
     public DateTime DatePublished { get; set; }

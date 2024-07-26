@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using LibraryManagementSystemAPI.Books.Data;
 
-namespace LibraryManagementSystemAPI.Models;
+namespace LibraryManagementSystemAPI.Publisher;
 
 public class Publisher
 {

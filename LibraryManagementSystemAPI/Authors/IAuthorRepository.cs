@@ -1,6 +1,6 @@
-using LibraryManagementSystemAPI.Models;
+using LibraryManagementSystemAPI.Authors.Models;
 
-namespace LibraryManagementSystemAPI.Controllers;
+namespace LibraryManagementSystemAPI.Authors;
 
 public interface IAuthorRepository
 {
