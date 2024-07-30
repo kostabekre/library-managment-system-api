@@ -1,3 +1,3 @@
 namespace LibraryManagementSystemAPI.Models;
 
-public record Error(int Code, string Message);
+public record Error(int Code, IEnumerable<string> Messages);

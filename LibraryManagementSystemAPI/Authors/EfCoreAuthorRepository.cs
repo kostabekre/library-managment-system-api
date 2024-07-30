@@ -54,4 +54,8 @@ public class EfCoreAuthorRepository : IAuthorRepository
             .Select(a => (AuthorFullInfo)a)
             .ToListAsync();
     }
+
+    public async Task<bool> IsNameUnique(string name) => await _bookContext
+        .Authors.AnyAsync(a => a.Name == name) == false;
+
 }

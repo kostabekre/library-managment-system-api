@@ -9,4 +9,5 @@ public interface IAuthorRepository
     Task<bool> DeleteAuthor(int id);
     Task<bool> UpdateAuthor(int id, AuthorInfo author);
     Task<IEnumerable<AuthorFullInfo>> GetAllAuthors();
+    Task<bool> IsNameUnique(string name);
 }

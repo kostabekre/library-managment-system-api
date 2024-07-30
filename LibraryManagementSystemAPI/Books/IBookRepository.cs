@@ -8,8 +8,8 @@ public interface IBookRepository
 {
     Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfo();
     Task<PagedList<IList<BookShortInfo>>> GetBooksShortInfo(BookParameters parameters);
-    Task<int> CreateBook(BookCreateDto model);
-    Task<int> CreateBookWithCover(BookWithCoverCreateDto model);
+    Task<Result<int>> CreateBook(BookCreateDto model);
+    Task<Result<int>> CreateBookWithCover(BookWithCoverCreateDto model);
     Task<BookInfo?> GetBook(int id);
     Task<bool> RemoveBook(int id);
     Task<bool> UpdateBook(int id, BookUpdateDto bookDTO);

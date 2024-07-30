@@ -1,3 +1,4 @@
+using FluentValidation;
 using LibraryManagementSystemAPI.Publisher.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,12 @@ namespace LibraryManagementSystemAPI.Publisher;
 public class PublishersController : ControllerBase
 {
     private readonly IPublisherRepository _publisherRepository;
+    private readonly IValidator<PublisherInfo> _validator;
 
-    public PublishersController(IPublisherRepository publisherRepository)
+    public PublishersController(IPublisherRepository publisherRepository, IValidator<PublisherInfo> validator)
     {
         _publisherRepository = publisherRepository;
+        _validator = validator;
     }
 
     [HttpGet]
@@ -36,15 +39,26 @@ public class PublishersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<PublisherFullInfo>> CreatePublisher(PublisherInfo info)
     {
+        var validationResult = await _validator.ValidateAsync(info);
+        if (validationResult.IsValid == false)
+        {
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
         var fullInfo =  await _publisherRepository.CreatePublisher(info);
         return CreatedAtAction(nameof(GetPublisher), new {fullInfo.Id}, fullInfo);
     }
 
     [HttpPut]
     [Route("{id}")]
-    public async Task<ActionResult> UpdateAuthor(int id, PublisherInfo publisher)
+    public async Task<ActionResult> UpdateAuthor(int id, PublisherInfo info)
     {
-        bool updated = await _publisherRepository.UpdatePublisher(id, publisher);
+        var validationResult = await _validator.ValidateAsync(info);
+        if (validationResult.IsValid == false)
+        {
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
+        }
+        
+        bool updated = await _publisherRepository.UpdatePublisher(id, info);
         if (updated == false)
         {
             return NotFound();

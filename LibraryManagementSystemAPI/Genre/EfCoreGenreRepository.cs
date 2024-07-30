@@ -45,4 +45,7 @@ public class EfCoreGenreRepository : IGenreRepository
         var rowsDeleted = await _bookContext.Genres.Where(g => g.Id == id).ExecuteDeleteAsync();
         return rowsDeleted > 0;
     }
+
+    public async Task<bool> IsNameUnique(string name) =>
+        await _bookContext.Genres.AnyAsync(g => g.Name == name) == false;
 }

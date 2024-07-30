@@ -1,8 +1,8 @@
 using LibraryManagementSystemAPI.Books.CoverValidation;
 using LibraryManagementSystemAPI.Context;
-using LibraryManagementSystemAPI.Models;
 using LibraryManagementSystemAPI.Repository;
 using LibraryManagementSystemAPI.Seed;
+using LibraryManagementSystemAPI.Validators;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,8 +13,8 @@ builder.Services.AddDbContext<BookContext>(options =>
 });
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+builder.Services.AddValidators();
 builder.Services.AddRepositories();
-builder.Services.AddScoped<ICoverValidation, DefaultCoverValidation>();
 builder.Services.AddCoverValidationValues(builder);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

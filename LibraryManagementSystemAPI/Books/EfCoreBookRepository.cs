@@ -11,12 +11,10 @@ namespace LibraryManagementSystemAPI.Books;
 public class EfCoreBookRepository : IBookRepository
 {
     private readonly BookContext _bookContext;
-    private readonly ICoverValidation _coverValidation;
 
-    public EfCoreBookRepository(BookContext bookContext, ICoverValidation coverValidation)
+    public EfCoreBookRepository(BookContext bookContext)
     {
         _bookContext = bookContext;
-        _coverValidation = coverValidation;
     }
 
     public async Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfo() => await _bookContext.Books
@@ -41,20 +39,18 @@ public class EfCoreBookRepository : IBookRepository
         return new PagedList<IList<BookShortInfo>>(result, parameters.PageSize, parameters.PageNumber, result.Count);
     }
 
-    public async Task<int> CreateBook(BookCreateDto dto)
+    public async Task<Result<int>> CreateBook(BookCreateDto dto)
     {
         var book = BookCreateDto.Convert(dto);
 
         var bookId = await SaveBook(dto, book);
-        return bookId;
+        return new Result<int>(){Data = bookId};
     }
-    public async Task<int> CreateBookWithCover(BookWithCoverCreateDto dto)
+    public async Task<Result<int>> CreateBookWithCover(BookWithCoverCreateDto dto)
     {
-        var isCoverValid = _coverValidation.IsFileValid(dto.Cover);
-        
-        var book = BookWithCoverCreateDto.Convert(dto, isCoverValid.Result, isCoverValid.Name);
+        var book = BookWithCoverCreateDto.Convert(dto, CoverReader.ReadAllBytes(dto.Cover), CoverReader.GetFileName());
 
-        return await SaveBook(dto.Details, book);
+        return new Result<int>() { Data = await SaveBook(dto.Details, book) };
     }
 
     private async Task<int> SaveBook(BookCreateDto dto, Book book)
@@ -155,19 +151,14 @@ public class EfCoreBookRepository : IBookRepository
 
     public async Task<Error?> UpdateCover(int id, IFormFile file)
     {
-        var isCoverValid = _coverValidation.IsFileValid(file);
-        if (!isCoverValid.IsValid)
-        {
-            return new Error(400, isCoverValid.Message);
-        }
-
-        string newName = $"{Guid.NewGuid()}.jpg";
+        byte[] readen = CoverReader.ReadAllBytes(file);
+        string newName = CoverReader.GetFileName();
 
         var rowsUpdated = await _bookContext.Set<BookCover>()
             .Where(c => c.BookId == id)
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(c => c.Name, newName)
-                .SetProperty(c => c.CoverFile, isCoverValid.Result)
+                .SetProperty(c => c.CoverFile, readen)
                 .SetProperty(c => c.BookId, id));
 
         if (rowsUpdated > 0)
@@ -175,7 +166,7 @@ public class EfCoreBookRepository : IBookRepository
             return null;
         }
 
-        var bookCover = new BookCover() { BookId = id,  CoverFile = isCoverValid.Result!, Name = newName  };
+        var bookCover = new BookCover() { BookId = id,  CoverFile = readen, Name = newName  };
         _bookContext.Set<BookCover>().Add(bookCover);
         try
         {
@@ -183,7 +174,7 @@ public class EfCoreBookRepository : IBookRepository
         }
         catch (DbUpdateException e)
         {
-            return new Error(404, "Not Founded");
+            return new Error(404, new List<string>(){"Not Founded"});
         }
 
         return null;
@@ -209,7 +200,7 @@ public class EfCoreBookRepository : IBookRepository
         }
         catch (DbUpdateException e)
         {
-            return new Error(404, "Not Founded");
+            return new Error(404, new List<string>(){"Not Founded"});
         }
 
         return null;
@@ -234,7 +225,7 @@ public class EfCoreBookRepository : IBookRepository
         }
         catch (DbUpdateException e)
         {
-            return new Error(404, "Not Founded");
+            return new Error(404, new List<string>(){"Not Founded"});
         }
 
         return null;

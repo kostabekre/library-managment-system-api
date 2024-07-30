@@ -3,7 +3,7 @@ namespace LibraryManagementSystemAPI.Authors.Models;
 public class AuthorInfo
 {
     public string Name { get; init; }
-    public string Biography { get; init; }
+    public string? Biography { get; init; }
 
     public static explicit operator AuthorInfo(Author author) => Convert(author);
     public static explicit operator Author(AuthorInfo info) => Convert(info);

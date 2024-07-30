@@ -8,4 +8,5 @@ public interface IGenreRepository
     Task<GenreFullInfo?> GetGenre(int id);
     Task<IEnumerable<GenreFullInfo>> GetAllGenre();
     Task<bool> RemoveGenre(int id);
+    Task<bool> IsNameUnique(string name);
 }

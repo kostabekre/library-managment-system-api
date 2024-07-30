@@ -1,8 +1,9 @@
+using FluentValidation;
 using Microsoft.Extensions.Options;
 
 namespace LibraryManagementSystemAPI.Books.CoverValidation;
 
-public class DefaultCoverValidation : ICoverValidation
+public class BookCoverValidator : AbstractValidator<CoverInfo>
 {
     private static readonly string[] _fileExtensions = new string[]{".jpg", ".png"};
     private static readonly Dictionary<string, List<byte[]>> _fileSignature = 
@@ -25,9 +26,16 @@ public class DefaultCoverValidation : ICoverValidation
     
     private readonly CoverValidationValues _validationValues;
 
-    public DefaultCoverValidation(IOptions<CoverValidationValues> validationValues)
+    public BookCoverValidator(IOptions<CoverValidationValues> validationValues)
     {
         _validationValues = validationValues.Value;
+        
+        RuleFor(c => c.File)
+            .Cascade(CascadeMode.Stop)
+            .NotNull().WithMessage("File must not be empty")
+            .Must(BeNotMoreMaxSize).WithMessage("File is more than 2 MB!")
+            .Must(HaveImageExtension).WithMessage("File is jpg or png!")
+            .Must(HaveValidSignature).WithMessage("File is not an image!");
     }
 
     private bool IsValidSignature(string extension, byte[] fileBytes)
@@ -37,30 +45,16 @@ public class DefaultCoverValidation : ICoverValidation
         return signatures.Any(signature => 
             fileBytes.Take(signature.Length).SequenceEqual(signature));
     }
-    public CoverValidationResult IsFileValid(IFormFile? file)
+
+    private bool HaveValidSignature(IFormFile file)
     {
-        if (file.Length > _validationValues.MaxSize)
-        {
-            return new CoverValidationResult() { IsValid = false, Message = "File cannot be more than 2 MB!" };
-        }
-
-        var extension = Path.GetExtension(file.FileName);
-        if (!_fileExtensions.Contains(extension))
-        {
-            return new CoverValidationResult() { IsValid = false, Message = "File doesn't have valid extension" };
-        }
-
-        byte[] readenBytes;
+        var maxBytes = _fileSignature.Values.Max(l => l.Select(array => array.Length).Max());
+        byte[] readenBytes = new byte[maxBytes];
         
         using (Stream openReadStream = file.OpenReadStream())
         {
-            using (var memoryStream = new MemoryStream())
-            {
-                openReadStream.CopyTo(memoryStream);
-                readenBytes = memoryStream.ToArray();
-            }
+            openReadStream.Read(readenBytes, 0, maxBytes);
         }
-        
         bool isValid = false;
         foreach (var signatureKey in _fileSignature.Keys)
         {
@@ -71,12 +65,17 @@ public class DefaultCoverValidation : ICoverValidation
             }
         }
 
-        if (isValid == false)
-        {
-            return new CoverValidationResult() { IsValid = false, Message = "File is not an image!" };
-        }
+        return isValid;
+    }
 
-        return new CoverValidationResult() { IsValid = true, Message = "File is valid", Result = readenBytes, Name = $"{Guid.NewGuid()}.jpg"};
-        
+    private bool BeNotMoreMaxSize(IFormFile file)
+    {
+        return file.Length < _validationValues.MaxSize;
+    }
+
+    private bool HaveImageExtension(IFormFile file)
+    {
+        var extension = Path.GetExtension(file.FileName);
+        return _fileExtensions.Contains(extension);
     }
 }

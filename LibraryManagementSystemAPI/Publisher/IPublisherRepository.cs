@@ -9,4 +9,5 @@ public interface IPublisherRepository
     Task<bool> UpdatePublisher(int id, PublisherInfo info);
     Task<bool> DeletePublisher(int id);
     Task<IEnumerable<PublisherFullInfo>> GetAllPublishers();
+    Task<bool> IsPublisherUnique(string name);
 }

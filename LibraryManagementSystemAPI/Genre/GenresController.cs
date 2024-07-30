@@ -1,3 +1,4 @@
+using FluentValidation;
 using LibraryManagementSystemAPI.Genre.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,12 @@ namespace LibraryManagementSystemAPI.Genre;
 public class GenresController : ControllerBase 
 {
     private readonly IGenreRepository _genreRepository;
+    private readonly IValidator<GenreInfo> _validator;
 
-    public GenresController(IGenreRepository genreRepository)
+    public GenresController(IGenreRepository genreRepository, IValidator<GenreInfo> validator)
     {
         _genreRepository = genreRepository;
+        _validator = validator;
     }
 
     [HttpGet]
@@ -49,6 +52,11 @@ public class GenresController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<GenreFullInfo>> CreateGenre(GenreInfo info)
     {
+        var validationResult = await _validator.ValidateAsync(info);
+        if (validationResult.IsValid == false)
+        {
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
+        }
         var fullInfo = await _genreRepository.CreateGenre(info);
         return CreatedAtAction(nameof(GetGenre), new {fullInfo.Id}, fullInfo);
     }

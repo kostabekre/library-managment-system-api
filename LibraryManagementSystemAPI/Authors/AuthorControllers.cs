@@ -1,3 +1,4 @@
+using FluentValidation;
 using LibraryManagementSystemAPI.Authors.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,12 @@ namespace LibraryManagementSystemAPI.Authors;
 public class AuthorsController : ControllerBase
 {
     private readonly IAuthorRepository _authorRepository;
+    private readonly IValidator<AuthorInfo> _validator;
 
-    public AuthorsController(IAuthorRepository authorRepository)
+    public AuthorsController(IAuthorRepository authorRepository, IValidator<AuthorInfo> validator)
     {
         _authorRepository = authorRepository;
+        _validator = validator;
     }
 
     [HttpGet]
@@ -34,17 +37,28 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<AuthorFullInfo>> CreateAuthor(AuthorInfo author)
+    public async Task<ActionResult<AuthorFullInfo>> CreateAuthor(AuthorInfo info)
     {
-        var fullInfo = await _authorRepository.CreateAuthor(author);
+        var validationResult = await _validator.ValidateAsync(info);
+        if (validationResult.IsValid == false)
+        {
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+        var fullInfo = await _authorRepository.CreateAuthor(info);
         return CreatedAtAction(nameof(GetAuthor), new {fullInfo.Id}, fullInfo);
     }
 
     [HttpPut]
     [Route("{id}")]
-    public async Task<ActionResult> UpdateAuthor(int id, AuthorInfo author)
+    public async Task<ActionResult> UpdateAuthor(int id, AuthorInfo info)
     {
-        bool updated = await _authorRepository.UpdateAuthor(id, author);
+        var validationResult = await _validator.ValidateAsync(info);
+        if (validationResult.IsValid == false)
+        {
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+        
+        bool updated = await _authorRepository.UpdateAuthor(id, info);
         if (updated == false)
         {
             return NotFound();

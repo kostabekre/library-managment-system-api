@@ -1,8 +1,9 @@
 using System.Text.Json;
+using FluentValidation;
+using LibraryManagementSystemAPI.Books.CoverValidation;
 using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementSystemAPI.Books;
 
@@ -12,11 +13,18 @@ public class BooksController : ControllerBase
 {
     private readonly IBookRepository _bookRepository;
     private readonly ILogger<BooksController> _logger;
+    private readonly IValidator<BookCreateDto> _bookValidator;
+    private readonly IValidator<CoverInfo> _bookCoverValidator;
 
-    public BooksController(IBookRepository bookRepository, ILogger<BooksController> logger)
+    public BooksController(IBookRepository bookRepository,
+        ILogger<BooksController> logger,
+        IValidator<CoverInfo> bookCoverValidator,
+        IValidator<BookCreateDto> bookValidator)
     {
         _bookRepository = bookRepository;
         _logger = logger;
+        _bookCoverValidator = bookCoverValidator;
+        _bookValidator = bookValidator;
     }
 
     [HttpGet]
@@ -62,34 +70,57 @@ public class BooksController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateBook(BookCreateDto bookDto)
     {
-        int createdId;
-        try
+        var validationResult = _bookValidator.Validate(bookDto);
+
+        if (validationResult.IsValid == false)
         {
-            createdId = await _bookRepository.CreateBook(bookDto);
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
         }
-        catch (DbUpdateException e)
+        
+        var result = await _bookRepository.CreateBook(bookDto);
+
+        if (result.IsFailure)
         {
-            return BadRequest();
+            if (result.Error.Code == 401)
+            {
+                return BadRequest(result.Error.Messages);
+            }
+            
+            return StatusCode(500);
         }
 
-        return CreatedAtAction(nameof(GetBook), new { Id = createdId }, createdId);
+        return CreatedAtAction(nameof(GetBook), new { Id = result.Data }, result.Data);
     }
     
     [HttpPost]
     [Route("cover")]
     public async Task<ActionResult> CreateBookWithCover(BookWithCoverCreateDto bookWithCover)
     {
-        int createdId;
-        try
+        var validationResult = _bookCoverValidator.Validate(new CoverInfo(bookWithCover.Cover));
+
+        if (validationResult.IsValid == false)
         {
-            createdId = await _bookRepository.CreateBookWithCover(bookWithCover);
-        }
-        catch (DbUpdateException e)
-        {
-            return BadRequest();
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
         }
 
-        return CreatedAtAction(nameof(GetBook), new { Id = createdId }, createdId);
+        var createValidationResult = _bookValidator.Validate(bookWithCover.Details);
+
+        if (createValidationResult.IsValid == false)
+        {
+            return BadRequest(createValidationResult.Errors.Select(e => e.ErrorMessage).ToList());
+        }
+        
+        var result = await _bookRepository.CreateBookWithCover(bookWithCover);
+
+        if (result.IsFailure)
+        {
+            if (result.Error.Code == 401)
+            {
+                return BadRequest(result.Error.Messages);
+            }
+        }
+
+        return CreatedAtAction(nameof(GetBook), new { Id = result.Data }, result.Data);
     }
 
     [HttpPut]

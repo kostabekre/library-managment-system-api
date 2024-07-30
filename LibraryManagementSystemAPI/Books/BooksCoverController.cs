@@ -1,3 +1,6 @@
+using FluentValidation;
+using LibraryManagementSystemAPI.Books.CoverValidation;
+using LibraryManagementSystemAPI.Books.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystemAPI.Books;
@@ -8,11 +11,13 @@ public class BooksCoverController : ControllerBase
 {
     private readonly IBookRepository _bookRepository;
     private readonly ILogger<BooksController> _logger;
+    private readonly IValidator<CoverInfo> _validator;
 
-    public BooksCoverController(IBookRepository bookRepository, ILogger<BooksController> logger)
+    public BooksCoverController(IBookRepository bookRepository, ILogger<BooksController> logger, IValidator<CoverInfo> validator)
     {
         _bookRepository = bookRepository;
         _logger = logger;
+        _validator = validator;
     }
 
     
@@ -20,11 +25,17 @@ public class BooksCoverController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult> UpdateCover(int id, IFormFile file)
     {
+        var validationResult = _validator.Validate(new CoverInfo(file));
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
+        }
+        
         var error = await _bookRepository.UpdateCover(id, file);
 
         if (error != null)
         {
-            return StatusCode(error.Code, error.Message);
+            return StatusCode(error.Code, error.Messages);
         }
 
         return Ok();
