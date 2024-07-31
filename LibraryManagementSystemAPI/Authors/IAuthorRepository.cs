@@ -4,10 +4,10 @@ namespace LibraryManagementSystemAPI.Authors;
 
 public interface IAuthorRepository
 {
-    Task<AuthorFullInfo?> GetAuthor(int id);
-    Task<AuthorFullInfo> CreateAuthor(AuthorInfo info);
-    Task<bool> DeleteAuthor(int id);
-    Task<bool> UpdateAuthor(int id, AuthorInfo author);
-    Task<IEnumerable<AuthorFullInfo>> GetAllAuthors();
-    Task<bool> IsNameUnique(string name);
+    Task<AuthorFullInfo?> GetAuthorAsync(int id);
+    Task<AuthorFullInfo> CreateAuthorAsync(AuthorInfo info);
+    Task<bool> DeleteAuthorAsync(int id);
+    Task<bool> UpdateAuthorAsync(int id, AuthorInfo author);
+    Task<IEnumerable<AuthorFullInfo>> GetAllAuthorsAsync();
+    Task<bool> IsNameUniqueAsync(string name);
 }

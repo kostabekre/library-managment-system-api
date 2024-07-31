@@ -13,7 +13,7 @@ public class EfCoreAuthorRepository : IAuthorRepository
         _bookContext = bookContext;
     }
 
-    public async Task<AuthorFullInfo?> GetAuthor(int id)
+    public async Task<AuthorFullInfo?> GetAuthorAsync(int id)
     {
         var author = await _bookContext.Authors
             .AsNoTracking()
@@ -22,7 +22,7 @@ public class EfCoreAuthorRepository : IAuthorRepository
         return (AuthorFullInfo)author;
     }
 
-    public async Task<AuthorFullInfo> CreateAuthor(AuthorInfo info)
+    public async Task<AuthorFullInfo> CreateAuthorAsync(AuthorInfo info)
     {
         var author = (Author)info;
         _bookContext.Authors.Add(author);
@@ -30,13 +30,13 @@ public class EfCoreAuthorRepository : IAuthorRepository
         return (AuthorFullInfo)author;
     }
 
-    public async Task<bool> DeleteAuthor(int id)
+    public async Task<bool> DeleteAuthorAsync(int id)
     {
         var rowsDeleted = await _bookContext.Authors.Where(a => a.Id == id).ExecuteDeleteAsync();
         return rowsDeleted > 0;
     }
 
-    public async Task<bool> UpdateAuthor(int id, AuthorInfo author)
+    public async Task<bool> UpdateAuthorAsync(int id, AuthorInfo author)
     {
         var rowsUpdated = await _bookContext.Authors
             .Where(a => a.Id == id)
@@ -47,7 +47,7 @@ public class EfCoreAuthorRepository : IAuthorRepository
         return rowsUpdated > 0;
     }
 
-    public async Task<IEnumerable<AuthorFullInfo>> GetAllAuthors()
+    public async Task<IEnumerable<AuthorFullInfo>> GetAllAuthorsAsync()
     {
         return await _bookContext.Authors
             .AsNoTracking()
@@ -55,7 +55,7 @@ public class EfCoreAuthorRepository : IAuthorRepository
             .ToListAsync();
     }
 
-    public async Task<bool> IsNameUnique(string name) => await _bookContext
+    public async Task<bool> IsNameUniqueAsync(string name) => await _bookContext
         .Authors.AnyAsync(a => a.Name == name) == false;
 
 }

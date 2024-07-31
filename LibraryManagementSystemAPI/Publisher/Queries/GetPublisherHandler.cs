@@ -3,7 +3,7 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Publisher;
 
-internal class GetPublisherHandler : IRequestHandler<GetPublisherQuery, PublisherFullInfo?>
+internal sealed class GetPublisherHandler : IRequestHandler<GetPublisherQuery, PublisherFullInfo?>
 {
     private readonly IPublisherRepository _publisherRepository;
 

@@ -12,7 +12,7 @@ public class AuthorValidator : AbstractValidator<AuthorInfo>
             .NotEmpty()
             .Length(3, 50)
             .MustAsync(async (name, _) =>
-                await authorRepository.IsNameUnique(name))
+                await authorRepository.IsNameUniqueAsync(name))
             .WithMessage("{PropertyName} is not unique!");
     }
 }

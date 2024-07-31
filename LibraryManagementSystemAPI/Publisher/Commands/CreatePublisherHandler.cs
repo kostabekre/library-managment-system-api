@@ -5,7 +5,7 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Publisher.Commands;
 
-internal class CreatePublisherHandler : IRequestHandler<CreatePublisherCommand, Result<PublisherFullInfo>>
+internal sealed class CreatePublisherHandler : IRequestHandler<CreatePublisherCommand, Result<PublisherFullInfo>>
 {
     private readonly IValidator<PublisherInfo> _validator;
     private readonly IPublisherRepository _publisherRepository;

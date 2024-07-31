@@ -1,5 +1,8 @@
 using FluentValidation;
+using LibraryManagementSystemAPI.Authors.Commands;
 using LibraryManagementSystemAPI.Authors.Models;
+using LibraryManagementSystemAPI.Authors.Queries;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystemAPI.Authors;
@@ -8,19 +11,18 @@ namespace LibraryManagementSystemAPI.Authors;
 [Route("api/[controller]")]
 public class AuthorsController : ControllerBase
 {
-    private readonly IAuthorRepository _authorRepository;
-    private readonly IValidator<AuthorInfo> _validator;
+    private readonly IMediator _mediator;
 
-    public AuthorsController(IAuthorRepository authorRepository, IValidator<AuthorInfo> validator)
+    public AuthorsController(IMediator mediator)
     {
-        _authorRepository = authorRepository;
-        _validator = validator;
+        _mediator = mediator;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AuthorFullInfo>>> GetAllAuthors()
     {
-        IEnumerable<AuthorFullInfo> authors = await _authorRepository.GetAllAuthors();
+        var query = new GetAllAuthorsQuery();
+        var authors = await _mediator.Send(query);
         return Ok(authors);
     }
     
@@ -28,7 +30,8 @@ public class AuthorsController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult<AuthorFullInfo>> GetAuthor(int id)
     {
-        AuthorFullInfo? author = await _authorRepository.GetAuthor(id);
+        var query = new GetAuthorQuery(id);
+        var author = await _mediator.Send(query);
         if (author == null)
         {
             return NotFound();
@@ -39,12 +42,13 @@ public class AuthorsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<AuthorFullInfo>> CreateAuthor(AuthorInfo info)
     {
-        var validationResult = await _validator.ValidateAsync(info);
-        if (validationResult.IsValid == false)
+        var command = new CreateAuthorCommand(info);
+        var result = await _mediator.Send(command);
+        if (result.IsFailure)
         {
-            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+            return StatusCode(result.Error!.Code, result.Error.Messages);
         }
-        var fullInfo = await _authorRepository.CreateAuthor(info);
+        AuthorFullInfo fullInfo = result.Data!;
         return CreatedAtAction(nameof(GetAuthor), new {fullInfo.Id}, fullInfo);
     }
 
@@ -52,16 +56,11 @@ public class AuthorsController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult> UpdateAuthor(int id, AuthorInfo info)
     {
-        var validationResult = await _validator.ValidateAsync(info);
-        if (validationResult.IsValid == false)
+        var command = new UpdateAuthorCommand(id, info);
+        var error = await _mediator.Send(command);
+        if (error != null)
         {
-            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
-        }
-        
-        bool updated = await _authorRepository.UpdateAuthor(id, info);
-        if (updated == false)
-        {
-            return NotFound();
+            return StatusCode(error.Code, error.Messages);
         }
 
         return Ok();
@@ -72,8 +71,9 @@ public class AuthorsController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult> DeleteAuthor(int id)
     {
-        bool deleted = await _authorRepository.DeleteAuthor(id);
-        if (deleted == false)
+        var command = new DeleteAuthorCommand(id);
+        var error = await _mediator.Send(command);
+        if (error != null)
         {
             return NotFound();
         }
