@@ -5,7 +5,7 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Publisher.Commands;
 
-public class CreatePublisherHandler : IRequestHandler<CreatePublisherCommand, Result<PublisherFullInfo>>
+internal class CreatePublisherHandler : IRequestHandler<CreatePublisherCommand, Result<PublisherFullInfo>>
 {
     private readonly IValidator<PublisherInfo> _validator;
     private readonly IPublisherRepository _publisherRepository;
@@ -21,10 +21,9 @@ public class CreatePublisherHandler : IRequestHandler<CreatePublisherCommand, Re
         var validationResult = await _validator.ValidateAsync(request.Info);
         if (validationResult.IsValid == false)
         {
-            return new Result<PublisherFullInfo>(new Error(401, validationResult.Errors.Select(e => e.ErrorMessage).ToList()));
+            return new Error(401, validationResult.Errors.Select(e => e.ErrorMessage).ToList());
         }
         
-        var fullInfo =  await _publisherRepository.CreatePublisherAsync(request.Info);
-        return new Result<PublisherFullInfo>(fullInfo);
+        return  await _publisherRepository.CreatePublisherAsync(request.Info);
     }
 }

@@ -13,7 +13,7 @@ public class EfCoreGenreRepository : IGenreRepository
         _bookContext = bookContext;
     }
 
-    public async Task<GenreFullInfo> CreateGenre(GenreInfo info)
+    public async Task<GenreFullInfo> CreateGenreAsync(GenreInfo info)
     {
         var genre = (Data.Genre)info;
         _bookContext.Genres.Add(genre);
@@ -21,7 +21,7 @@ public class EfCoreGenreRepository : IGenreRepository
         return (GenreFullInfo)genre;
     }
 
-    public async Task<GenreFullInfo?> GetGenre(int id)
+    public async Task<GenreFullInfo?> GetGenreAsync(int id)
     {
         var genre = await _bookContext.Genres
             .AsNoTracking()
@@ -35,17 +35,17 @@ public class EfCoreGenreRepository : IGenreRepository
         return (GenreFullInfo)genre;
     }
 
-    public async Task<IEnumerable<GenreFullInfo>> GetAllGenre() => await _bookContext.Genres
+    public async Task<IEnumerable<GenreFullInfo>> GetAllGenreAsync() => await _bookContext.Genres
         .AsNoTracking()
         .Select(g => (GenreFullInfo)g)
         .ToListAsync();
 
-    public async Task<bool> RemoveGenre(int id)
+    public async Task<bool> RemoveGenreAsync(int id)
     {
         var rowsDeleted = await _bookContext.Genres.Where(g => g.Id == id).ExecuteDeleteAsync();
         return rowsDeleted > 0;
     }
 
-    public async Task<bool> IsNameUnique(string name) =>
+    public async Task<bool> IsNameUniqueAsync(string name) =>
         await _bookContext.Genres.AnyAsync(g => g.Name == name) == false;
 }

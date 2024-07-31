@@ -3,7 +3,7 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Publisher.Commands;
 
-public class DeletePublisherHandler : IRequestHandler<DeletePublisherCommand, Error?>
+internal class DeletePublisherHandler : IRequestHandler<DeletePublisherCommand, Error?>
 {
     private readonly IPublisherRepository _publisherRepository;
 

@@ -4,9 +4,9 @@ namespace LibraryManagementSystemAPI.Genre;
 
 public interface IGenreRepository
 {
-    Task<GenreFullInfo> CreateGenre(GenreInfo info);
-    Task<GenreFullInfo?> GetGenre(int id);
-    Task<IEnumerable<GenreFullInfo>> GetAllGenre();
-    Task<bool> RemoveGenre(int id);
-    Task<bool> IsNameUnique(string name);
+    Task<GenreFullInfo> CreateGenreAsync(GenreInfo info);
+    Task<GenreFullInfo?> GetGenreAsync(int id);
+    Task<IEnumerable<GenreFullInfo>> GetAllGenreAsync();
+    Task<bool> RemoveGenreAsync(int id);
+    Task<bool> IsNameUniqueAsync(string name);
 }

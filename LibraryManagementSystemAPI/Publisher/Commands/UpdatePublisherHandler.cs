@@ -5,7 +5,7 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Publisher.Commands;
 
-public class UpdatePublisherHandler : IRequestHandler<UpdatePublisherCommand, Error?>
+internal class UpdatePublisherHandler : IRequestHandler<UpdatePublisherCommand, Error?>
 {
     private readonly IValidator<PublisherInfo> _validator;
     private readonly IPublisherRepository _publisherRepository;

@@ -12,7 +12,7 @@ public class GenreValidator : AbstractValidator<GenreInfo>
             .NotEmpty()
             .Length(2, 50)
             .MustAsync(async (name, _) => 
-                await repository.IsNameUnique(name))
+                await repository.IsNameUniqueAsync(name))
             .WithMessage("{PropertyName} is not unique!");
     }
 }

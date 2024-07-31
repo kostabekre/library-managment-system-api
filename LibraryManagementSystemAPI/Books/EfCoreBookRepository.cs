@@ -43,15 +43,13 @@ public class EfCoreBookRepository : IBookRepository
     {
         var book = BookCreateDto.Convert(dto);
 
-        var bookId = await SaveBook(dto, book);
-        return new Result<int>(bookId);
+        return await SaveBook(dto, book);
     }
     public async Task<Result<int>> CreateBookWithCover(BookWithCoverCreateDto dto)
     {
         var book = BookWithCoverCreateDto.Convert(dto, CoverReader.ReadAllBytes(dto.Cover), CoverReader.GetFileName());
 
-        var result = await SaveBook(dto.Details, book);
-        return new Result<int>(result);
+        return await SaveBook(dto.Details, book);
     }
 
     private async Task<int> SaveBook(BookCreateDto dto, Book book)

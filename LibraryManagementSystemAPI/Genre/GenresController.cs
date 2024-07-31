@@ -1,27 +1,29 @@
 using FluentValidation;
+using LibraryManagementSystemAPI.Genre.Commands;
 using LibraryManagementSystemAPI.Genre.Data;
+using LibraryManagementSystemAPI.Genre.Queries;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystemAPI.Genre;
 
 [ApiController]
 [Route("api/[controller]")]
-public class GenresController : ControllerBase 
+public class GenresController : ControllerBase
 {
-    private readonly IGenreRepository _genreRepository;
-    private readonly IValidator<GenreInfo> _validator;
+    private IMediator _mediator;
 
-    public GenresController(IGenreRepository genreRepository, IValidator<GenreInfo> validator)
+    public GenresController(IMediator mediator)
     {
-        _genreRepository = genreRepository;
-        _validator = validator;
+        _mediator = mediator;
     }
 
     [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult<GenreFullInfo>> GetGenre(int id)
     {
-        GenreFullInfo? genre = await _genreRepository.GetGenre(id);
+        var query = new GetGenreQuery(id);
+        var genre = await _mediator.Send(query);
         if (genre == null)
         {
             return NotFound();
@@ -32,32 +34,34 @@ public class GenresController : ControllerBase
     [HttpDelete]
     public async Task<ActionResult> RemoveGenre(int id)
     {
-        bool deleted = await _genreRepository.RemoveGenre(id);
-        if (!deleted)
+        var command = new RemoveGenreCommand(id);
+        var error = await _mediator.Send(command);
+        if (error != null)
         {
             return NotFound();
         }
+        
         return Ok();
     }
-    
     
     [HttpGet]
     [Route("get_all")]
     public async Task<ActionResult<IEnumerable<GenreFullInfo>>> GetAllGenres()
     {
-        var genres = await _genreRepository.GetAllGenre();
+        var query = new GetAllGenresQuery();
+        var genres = await _mediator.Send(query);
         return Ok(genres);
     }
     
     [HttpPost]
     public async Task<ActionResult<GenreFullInfo>> CreateGenre(GenreInfo info)
     {
-        var validationResult = await _validator.ValidateAsync(info);
-        if (validationResult.IsValid == false)
+        var command = new CreateGenreCommand(info);
+        var result = await _mediator.Send(command);
+        if (result.IsFailure)
         {
-            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
+            return StatusCode(result.Error!.Code, result.Error.Messages);
         }
-        var fullInfo = await _genreRepository.CreateGenre(info);
-        return CreatedAtAction(nameof(GetGenre), new {fullInfo.Id}, fullInfo);
+        return CreatedAtAction(nameof(GetGenre), new {result.Data!.Id}, result.Data);
     }
 }
