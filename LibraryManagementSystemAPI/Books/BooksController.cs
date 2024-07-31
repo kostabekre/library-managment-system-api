@@ -1,8 +1,8 @@
 using System.Text.Json;
-using FluentValidation;
-using LibraryManagementSystemAPI.Books.CoverValidation;
+using LibraryManagementSystemAPI.Books.Commands;
 using LibraryManagementSystemAPI.Books.Data;
-using LibraryManagementSystemAPI.Data;
+using LibraryManagementSystemAPI.Books.Queries;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystemAPI.Books;
@@ -11,34 +11,37 @@ namespace LibraryManagementSystemAPI.Books;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
-    private readonly IBookRepository _bookRepository;
-    private readonly ILogger<BooksController> _logger;
-    private readonly IValidator<BookCreateDto> _bookValidator;
-    private readonly IValidator<CoverInfo> _bookCoverValidator;
+    private readonly IMediator _mediator;
 
-    public BooksController(IBookRepository bookRepository,
-        ILogger<BooksController> logger,
-        IValidator<CoverInfo> bookCoverValidator,
-        IValidator<BookCreateDto> bookValidator)
+    public BooksController(IMediator mediator)
     {
-        _bookRepository = bookRepository;
-        _logger = logger;
-        _bookCoverValidator = bookCoverValidator;
-        _bookValidator = bookValidator;
+        _mediator = mediator;
     }
 
     [HttpGet]
     [Route("all")]
     public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetAllBooksShortInfo()
     {
-        var books = await _bookRepository.GetAllBooksShortInfo();
-        return Ok(books);
+        var query = new GetAllBooksShortInfoQuery();
+        var result = await _mediator.Send(query);
+        if (result.IsFailure)
+        {
+            return StatusCode(result.Error!.Code, result.Error.Messages);
+        }
+        return Ok(result.Data);
     }
 
     [HttpGet]
-    public async Task<ActionResult<PagedList<BookShortInfo>>> GetBooksShortInfo([FromQuery]BookParameters parameters)
+    public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetBooksShortInfo([FromQuery]BookParameters parameters)
     {
-        var books = await _bookRepository.GetBooksShortInfo(parameters);
+        var query = new GetAllBooksShortInfoPageListQuery(parameters);
+        var result = await _mediator.Send(query);
+        if (result.IsFailure)
+        {
+            return StatusCode(result.Error!.Code, result.Error.Messages);
+        }
+        
+        var books = result.Data!;
         var metadata = new
         {
             books.TotalPages,
@@ -50,15 +53,21 @@ public class BooksController : ControllerBase
         };
         
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
-        _logger.LogInformation($"Logged {books.TotalCount} from database");
-        return Ok(books.Data);
+        return Ok(books);
     }
 
     [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult<BookInfo>> GetBook(int id)
     {
-        var book = await _bookRepository.GetBook(id);
+        var query = new GetBookQuery(id);
+        var result = await _mediator.Send(query);
+        if (result.IsFailure)
+        {
+            return StatusCode(result.Error.Code, result.Error.Messages);
+        }
+
+        var book = result.Data;
         if (book == null)
         {
             return NotFound();
@@ -68,25 +77,13 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateBook(BookCreateDto bookDto)
+    public async Task<ActionResult<int>> CreateBook(BookCreateDto bookDto)
     {
-        var validationResult = _bookValidator.Validate(bookDto);
-
-        if (validationResult.IsValid == false)
-        {
-            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
-        }
-        
-        var result = await _bookRepository.CreateBook(bookDto);
-
+        var command = new CreateBookCommand(bookDto);
+        var result = await _mediator.Send(command);
         if (result.IsFailure)
         {
-            if (result.Error.Code == 401)
-            {
-                return BadRequest(result.Error.Messages);
-            }
-            
-            return StatusCode(500);
+            return StatusCode(result.Error!.Code, result.Error.Messages);
         }
 
         return CreatedAtAction(nameof(GetBook), new { Id = result.Data }, result.Data);
@@ -96,28 +93,11 @@ public class BooksController : ControllerBase
     [Route("cover")]
     public async Task<ActionResult> CreateBookWithCover(BookWithCoverCreateDto bookWithCover)
     {
-        var validationResult = _bookCoverValidator.Validate(new CoverInfo(bookWithCover.Cover));
-
-        if (validationResult.IsValid == false)
-        {
-            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
-        }
-
-        var createValidationResult = _bookValidator.Validate(bookWithCover.Details);
-
-        if (createValidationResult.IsValid == false)
-        {
-            return BadRequest(createValidationResult.Errors.Select(e => e.ErrorMessage).ToList());
-        }
-        
-        var result = await _bookRepository.CreateBookWithCover(bookWithCover);
-
+        var command = new CreateBookWithCoverCommand(bookWithCover);
+        var result = await _mediator.Send(command);
         if (result.IsFailure)
         {
-            if (result.Error.Code == 401)
-            {
-                return BadRequest(result.Error.Messages);
-            }
+            return StatusCode(result.Error.Code, result.Error.Messages);
         }
 
         return CreatedAtAction(nameof(GetBook), new { Id = result.Data }, result.Data);
@@ -125,25 +105,28 @@ public class BooksController : ControllerBase
 
     [HttpPut]
     [Route("{id}")]
-    public async Task<ActionResult<BookInfo>> UpdateBook(int id, BookUpdateDto book)
+    public async Task<ActionResult> UpdateBook(int id, BookUpdateDto book)
     {
-        bool updated = await _bookRepository.UpdateBook(id, book);
-        if (!updated)
+        var command = new UpdateBookCommand(id, book);
+        var error = await _mediator.Send(command);
+        if (error != null)
         {
-            return NotFound();
+            return StatusCode(error.Code, error.Messages);
         }
 
-        return Ok(book);
+        return Ok();
     }
     
     [HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult> RemoveBook(int id)
     {
-        bool deleted = await _bookRepository.RemoveBook(id);
-        if (!deleted)
+        var command = new RemoveBookCommand(id);
+        var error = await _mediator.Send(command);
+        
+        if (error != null)
         {
-            return NotFound();
+            return StatusCode(error.Code, error.Messages);
         }
 
         return Ok();
@@ -153,10 +136,11 @@ public class BooksController : ControllerBase
     [Route("amount/{id}")]
     public async Task<ActionResult> UpdateBookAmount(int id, [FromForm]int amount)
     {
-        var error = await _bookRepository.UpdateBookAmount(id, amount);
+        var command = new UpdateBookAmountCommand(id, amount);
+        var error = await _mediator.Send(command);
         if (error != null)
         {
-            return NotFound();
+            return StatusCode(error.Code, error.Messages);
         }
 
         return Ok();
@@ -166,12 +150,53 @@ public class BooksController : ControllerBase
     [Route("rating/{id}")]
     public async Task<ActionResult> UpdateBookRating(int id, [FromForm]int rating)
     {
-        var error = await _bookRepository.UpdateBookRating(id, rating);
+        var command = new UpdateBookRatingCommand(id, rating);
+        var error = await _mediator.Send(command);
         if (error != null)
         {
-            return NotFound();
+            return StatusCode(error.Code, error.Messages);
         }
 
         return Ok();
+    }
+    
+    [HttpPut]
+    [Route("cover/{id}")]
+    public async Task<ActionResult> UpdateCover(int id, IFormFile file)
+    {
+        var command = new UpdateBookCoverCommand(id, file);
+
+        var error = await _mediator.Send(command);
+
+        if (error != null)
+        {
+            return StatusCode(error.Code, error.Messages);
+        }
+
+        return Ok();
+    }
+    
+    [HttpGet]
+    [Route("cover/{id}")]
+    public async Task<ActionResult> GetCover(int id)
+    {
+        var query = new GetBookCoverQuery(id);
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return StatusCode(result.Error.Code, result.Error.Messages);
+        }
+
+        var bookCover = result.Data;
+
+        if (bookCover == null)
+        {
+            return NotFound();
+        }
+        
+        Response.Headers.Append("Content-Disposition", bookCover.CD.ToString());
+
+        return File(bookCover.File, "application/jpeg");
     }
 }

@@ -2,9 +2,8 @@ namespace LibraryManagementSystemAPI.Data;
 
 public sealed class PagedList<T> : List<T>
 {
-    public PagedList(T data, int pageSize, int pageNumber, int totalCount)
+    public PagedList(IEnumerable<T> data, int pageSize, int pageNumber, int totalCount) : base(data)
     {
-        Data = data;
         PageSize = pageSize;
         PageNumber = pageNumber;
         TotalCount = totalCount;
@@ -17,6 +16,4 @@ public sealed class PagedList<T> : List<T>
     public int PageNumber { get; }
     public int PageSize { get; }
     public int TotalPages { get; }
-    public T Data { get; }
-
 }

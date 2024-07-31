@@ -17,14 +17,14 @@ public class EfCoreBookRepository : IBookRepository
         _bookContext = bookContext;
     }
 
-    public async Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfo() => await _bookContext.Books
+    public async Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoAsync() => await _bookContext.Books
         .AsNoTracking()
         .Include(b => b.Publisher)
         .Include(b => b.Authors)
         .Select(b => new BookShortInfo(b.Id, b.Name,b.Authors!.First().Name, b.Publisher!.Name))
         .ToListAsync();
 
-    public async Task<PagedList<IList<BookShortInfo>>> GetBooksShortInfo(BookParameters parameters)
+    public async Task<PagedList<BookShortInfo>> GetBooksShortInfoAsync(BookParameters parameters)
     {
         var result = await _bookContext.Books
             .AsNoTracking()
@@ -36,16 +36,16 @@ public class EfCoreBookRepository : IBookRepository
             .Select(b => new BookShortInfo(b.Id, b.Name, b.Authors!.First().Name, b.Publisher!.Name))
             .ToListAsync();
 
-        return new PagedList<IList<BookShortInfo>>(result, parameters.PageSize, parameters.PageNumber, result.Count);
+        return new PagedList<BookShortInfo>(result, parameters.PageSize, parameters.PageNumber, result.Count);
     }
 
-    public async Task<Result<int>> CreateBook(BookCreateDto dto)
+    public async Task<int> CreateBookAsync(BookCreateDto dto)
     {
         var book = BookCreateDto.Convert(dto);
 
         return await SaveBook(dto, book);
     }
-    public async Task<Result<int>> CreateBookWithCover(BookWithCoverCreateDto dto)
+    public async Task<int> CreateBookWithCoverAsync(BookWithCoverCreateDto dto)
     {
         var book = BookWithCoverCreateDto.Convert(dto, CoverReader.ReadAllBytes(dto.Cover), CoverReader.GetFileName());
 
@@ -82,7 +82,7 @@ public class EfCoreBookRepository : IBookRepository
     }
 
 
-    public async Task<BookInfo?> GetBook(int id)
+    public async Task<BookInfo?> GetBookAsync(int id)
     {
         var book = await _bookContext.Books
             .AsNoTracking()
@@ -99,13 +99,13 @@ public class EfCoreBookRepository : IBookRepository
         return new BookInfo(book);
     }
 
-    public async Task<bool> RemoveBook(int id)
+    public async Task<bool> RemoveBookAsync(int id)
     {
         var rowsDeleted = await _bookContext.Books.Where(b => b.Id == id).ExecuteDeleteAsync();
         return rowsDeleted > 0;
     }
 
-    public async Task<bool> UpdateBook(int id, BookUpdateDto bookDto)
+    public async Task<bool> UpdateBookAsync(int id, BookUpdateDto bookDto)
     {
         var book = _bookContext.Books.Include(b => b.BookGenres).FirstOrDefault(b => b.Id == id);
         if (book == null)
@@ -127,7 +127,7 @@ public class EfCoreBookRepository : IBookRepository
         return true;
     }
 
-    public async Task<BookCoverDTO?> GetCover(int id)
+    public async Task<BookCoverDTO?> GetCoverAsync(int id)
     {
         var cover = await _bookContext.Set<BookCover>()
             .AsNoTracking()
@@ -148,7 +148,7 @@ public class EfCoreBookRepository : IBookRepository
         return new BookCoverDTO(){CD = cd, File = cover.CoverFile};
     }
 
-    public async Task<Error?> UpdateCover(int id, IFormFile file)
+    public async Task<bool> UpdateCoverAsync(int id, IFormFile file)
     {
         byte[] readen = CoverReader.ReadAllBytes(file);
         string newName = CoverReader.GetFileName();
@@ -162,24 +162,18 @@ public class EfCoreBookRepository : IBookRepository
 
         if (rowsUpdated > 0)
         {
-            return null;
+            return false;
         }
 
         var bookCover = new BookCover() { BookId = id,  CoverFile = readen, Name = newName  };
         _bookContext.Set<BookCover>().Add(bookCover);
-        try
-        {
-            await _bookContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException e)
-        {
-            return new Error(404, new List<string>(){"Not Founded"});
-        }
+        
+        await _bookContext.SaveChangesAsync();
 
-        return null;
+        return true;
     }
 
-    public async Task<Error?> UpdateBookRating(int id, int rating)
+    public async Task<bool> UpdateBookRatingAsync(int id, int rating)
     {
         int rowsUpdated = await _bookContext.Set<BookRating>()
             .Where(r => r.BookId == id)
@@ -188,24 +182,18 @@ public class EfCoreBookRepository : IBookRepository
 
         if (rowsUpdated > 0)
         {
-            return null;
+            return false;
         }
         
         var bookRating = new BookRating() { BookId = id,  Rating = rating };
         _bookContext.Set<BookRating>().Add(bookRating);
-        try
-        {
-            await _bookContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException e)
-        {
-            return new Error(404, new List<string>(){"Not Founded"});
-        }
+        
+        await _bookContext.SaveChangesAsync();
 
-        return null;
+        return true;
     }
 
-    public async Task<Error?> UpdateBookAmount(int id, int amount)
+    public async Task<bool> UpdateBookAmountAsync(int id, int amount)
     {
         int rowsUpdated = await _bookContext.Set<BookAmount>()
             .Where(r => r.BookId == id)
@@ -213,20 +201,14 @@ public class EfCoreBookRepository : IBookRepository
                 parameters.SetProperty(r => r.Amount, amount));
         if (rowsUpdated > 0)
         {
-            return null;
+            return false;
         }
         
         var bookAmount = new BookAmount() { BookId = id,  Amount = amount};
         _bookContext.Set<BookAmount>().Add(bookAmount);
-        try
-        {
-            await _bookContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException e)
-        {
-            return new Error(404, new List<string>(){"Not Founded"});
-        }
+        
+        await _bookContext.SaveChangesAsync();
 
-        return null;
+        return true;
     }
 }
