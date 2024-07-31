@@ -22,6 +22,6 @@ public class PublisherInfo
 
     private static Publisher Convert(PublisherInfo info)
     {
-        return new Publisher() { Name = info.Name, Address = info.Name };
+        return new Publisher() { Name = info.Name, Address = info.Address };
     }
 }

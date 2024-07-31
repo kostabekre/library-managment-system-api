@@ -13,10 +13,10 @@ public class EfCorePublisherRepository : IPublisherRepository
         _bookContext = bookContext;
     }
 
-    public async Task<bool> IsPublisherUnique(string name) => await _bookContext
+    public async Task<bool> IsPublisherUniqueAsync(string name) => await _bookContext
         .Publishers
         .AnyAsync(p => p.Name == name) == false;
-    public async Task<PublisherFullInfo?> GetPublisher(int id)
+    public async Task<PublisherFullInfo?> GetPublisherAsync(int id)
     {
         var publisher = await _bookContext.Publishers
             .AsNoTracking()
@@ -30,7 +30,7 @@ public class EfCorePublisherRepository : IPublisherRepository
         return (PublisherFullInfo?)publisher;
     }
 
-    public async Task<PublisherFullInfo> CreatePublisher(PublisherInfo info)
+    public async Task<PublisherFullInfo> CreatePublisherAsync(PublisherInfo info)
     {
         var publisher = (Data.Publisher)info;
         _bookContext.Publishers.Add(publisher);
@@ -38,7 +38,7 @@ public class EfCorePublisherRepository : IPublisherRepository
         return (PublisherFullInfo)publisher;
     }
 
-    public async Task<bool> UpdatePublisher(int id, PublisherInfo info)
+    public async Task<bool> UpdatePublisherAsync(int id, PublisherInfo info)
     {
         var updatedRows = await _bookContext.Publishers
             .Where(p => p.Id == id)
@@ -49,7 +49,7 @@ public class EfCorePublisherRepository : IPublisherRepository
         return updatedRows > 0;
     }
 
-    public async Task<bool> DeletePublisher(int id)
+    public async Task<bool> DeletePublisherAsync(int id)
     {
         var deletedRows = await _bookContext.Publishers
             .Where(p => p.Id == id)
@@ -57,7 +57,7 @@ public class EfCorePublisherRepository : IPublisherRepository
         return deletedRows > 0;
     }
 
-    public async Task<IEnumerable<PublisherFullInfo>> GetAllPublishers()
+    public async Task<IEnumerable<PublisherFullInfo>> GetAllPublishersAsync()
     {
         return await _bookContext.Publishers
             .AsNoTracking()

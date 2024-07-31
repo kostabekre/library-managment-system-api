@@ -13,6 +13,7 @@ builder.Services.AddDbContext<BookContext>(options =>
 });
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Transient);
 builder.Services.AddValidators();
 builder.Services.AddRepositories();
 builder.Services.AddCoverValidationValues(builder);

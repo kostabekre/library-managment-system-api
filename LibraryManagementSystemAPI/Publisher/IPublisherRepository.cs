@@ -4,10 +4,10 @@ namespace LibraryManagementSystemAPI.Publisher;
 
 public interface IPublisherRepository
 {
-    Task<PublisherFullInfo?> GetPublisher(int id);
-    Task<PublisherFullInfo> CreatePublisher(PublisherInfo author);
-    Task<bool> UpdatePublisher(int id, PublisherInfo info);
-    Task<bool> DeletePublisher(int id);
-    Task<IEnumerable<PublisherFullInfo>> GetAllPublishers();
-    Task<bool> IsPublisherUnique(string name);
+    Task<PublisherFullInfo?> GetPublisherAsync(int id);
+    Task<PublisherFullInfo> CreatePublisherAsync(PublisherInfo author);
+    Task<bool> UpdatePublisherAsync(int id, PublisherInfo info);
+    Task<bool> DeletePublisherAsync(int id);
+    Task<IEnumerable<PublisherFullInfo>> GetAllPublishersAsync();
+    Task<bool> IsPublisherUniqueAsync(string name);
 }

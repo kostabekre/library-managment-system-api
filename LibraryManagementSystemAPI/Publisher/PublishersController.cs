@@ -1,6 +1,7 @@
-using FluentValidation;
+using LibraryManagementSystemAPI.Publisher.Commands;
 using LibraryManagementSystemAPI.Publisher.Data;
 using Microsoft.AspNetCore.Mvc;
+using Mediator;
 
 namespace LibraryManagementSystemAPI.Publisher;
 
@@ -8,19 +9,18 @@ namespace LibraryManagementSystemAPI.Publisher;
 [Route("api/[controller]")]
 public class PublishersController : ControllerBase
 {
-    private readonly IPublisherRepository _publisherRepository;
-    private readonly IValidator<PublisherInfo> _validator;
+    private IMediator _mediator;
 
-    public PublishersController(IPublisherRepository publisherRepository, IValidator<PublisherInfo> validator)
+    public PublishersController(IMediator mediator)
     {
-        _publisherRepository = publisherRepository;
-        _validator = validator;
+        _mediator = mediator;
     }
 
     [HttpGet]
-    public async Task<ActionResult<PublisherFullInfo>> GetAllPublishers()
+    public async Task<ActionResult<IEnumerable<PublisherFullInfo>>> GetAllPublishers()
     {
-        IEnumerable<PublisherFullInfo> publishers = await _publisherRepository.GetAllPublishers();
+        var query = new GetAllPublishersQuery();
+        IEnumerable<PublisherFullInfo> publishers = await _mediator.Send(query);
         return Ok(publishers);
     }
     
@@ -28,7 +28,8 @@ public class PublishersController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult<PublisherFullInfo>> GetPublisher(int id)
     {
-        PublisherFullInfo? publisher = await _publisherRepository.GetPublisher(id);
+        var query = new GetPublisherQuery(id);
+        var publisher = await _mediator.Send(query);
         if (publisher == null)
         {
             return NotFound();
@@ -39,29 +40,29 @@ public class PublishersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<PublisherFullInfo>> CreatePublisher(PublisherInfo info)
     {
-        var validationResult = await _validator.ValidateAsync(info);
-        if (validationResult.IsValid == false)
+        var command = new CreatePublisherCommand(info);
+        var result = await _mediator.Send(command);
+        
+        if (result.IsFailure)
         {
-            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+            return StatusCode(result.Error!.Code, result.Error.Messages);
         }
-        var fullInfo =  await _publisherRepository.CreatePublisher(info);
+
+        PublisherFullInfo fullInfo = result.Data!;
+        
         return CreatedAtAction(nameof(GetPublisher), new {fullInfo.Id}, fullInfo);
     }
 
     [HttpPut]
     [Route("{id}")]
-    public async Task<ActionResult> UpdateAuthor(int id, PublisherInfo info)
+    public async Task<ActionResult> UpdatePublisher(int id, PublisherInfo info)
     {
-        var validationResult = await _validator.ValidateAsync(info);
-        if (validationResult.IsValid == false)
+        var command = new UpdatePublisherCommand(id, info);
+        var error = await _mediator.Send(command);
+
+        if (error != null)
         {
-            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
-        }
-        
-        bool updated = await _publisherRepository.UpdatePublisher(id, info);
-        if (updated == false)
-        {
-            return NotFound();
+            return StatusCode(error.Code, error.Messages);
         }
 
         return Ok();
@@ -72,8 +73,9 @@ public class PublishersController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult> DeletePublisher(int id)
     {
-        bool deleted = await _publisherRepository.DeletePublisher(id);
-        if (deleted == false)
+        var command = new DeletePublisherCommand(id);
+        var error = await _mediator.Send(command);
+        if (error != null)
         {
             return NotFound();
         }

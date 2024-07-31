@@ -15,7 +15,7 @@ public class PublisherValidator : AbstractValidator<PublisherInfo>
             .Matches("^[a-zA-Z_]+( [a-zA-Z_]+)*$")
             .WithMessage("{PropertyName} must have only letters!")
             .MustAsync(async (name, _) =>
-                await publisherRepository.IsPublisherUnique(name)
+                await publisherRepository.IsPublisherUniqueAsync(name)
             ).WithMessage("{PropertyName} is not unique!");
 
         RuleFor(p => p.Address)
