@@ -3,17 +3,11 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Authors.Queries;
 
-internal sealed class GetAuthorHandler : IRequestHandler<GetAuthorQuery, AuthorFullInfo?>
+internal sealed class GetAuthorHandler(IAuthorRepository authorRepository)
+    : IRequestHandler<GetAuthorQuery, AuthorFullInfo?>
 {
-    private readonly IAuthorRepository _authorRepository;
-
-    public GetAuthorHandler(IAuthorRepository authorRepository)
-    {
-        _authorRepository = authorRepository;
-    }
-
     public async ValueTask<AuthorFullInfo?> Handle(GetAuthorQuery request, CancellationToken cancellationToken)
     {
-        return await _authorRepository.GetAuthorAsync(request.Id);
+        return await authorRepository.GetAuthorAsync(request.Id);
     }
 }

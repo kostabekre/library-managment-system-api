@@ -2,6 +2,7 @@ using FluentValidation;
 using LibraryManagementSystemAPI.Authors.Commands;
 using LibraryManagementSystemAPI.Authors.Models;
 using LibraryManagementSystemAPI.Authors.Queries;
+using LibraryManagementSystemAPI.Models;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,27 +19,30 @@ public class AuthorsController : ControllerBase
         _mediator = mediator;
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AuthorFullInfo>>> GetAllAuthors()
     {
         var query = new GetAllAuthorsQuery();
+        
         var authors = await _mediator.Send(query);
+        
         return Ok(authors);
     }
     
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult<AuthorFullInfo>> GetAuthor(int id)
     {
         var query = new GetAuthorQuery(id);
         var author = await _mediator.Send(query);
-        if (author == null)
-        {
-            return NotFound();
-        }
-        return Ok(author);
+        return author == null ? NotFound() : Ok(author);
     }
 
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPost]
     public async Task<ActionResult<AuthorFullInfo>> CreateAuthor(AuthorInfo info)
     {
@@ -46,38 +50,33 @@ public class AuthorsController : ControllerBase
         var result = await _mediator.Send(command);
         if (result.IsFailure)
         {
-            return StatusCode(result.Error!.Code, result.Error.Messages);
+            return BadRequest(result.Error);
         }
         AuthorFullInfo fullInfo = result.Data!;
         return CreatedAtAction(nameof(GetAuthor), new {fullInfo.Id}, fullInfo);
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
     [HttpPut]
     [Route("{id}")]
     public async Task<ActionResult> UpdateAuthor(int id, AuthorInfo info)
     {
         var command = new UpdateAuthorCommand(id, info);
         var error = await _mediator.Send(command);
-        if (error != null)
-        {
-            return StatusCode(error.Code, error.Messages);
-        }
-
-        return Ok();
+        return error != null ? StatusCode(error.Code, error) : Ok();
     }
     
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
     [HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult> DeleteAuthor(int id)
     {
         var command = new DeleteAuthorCommand(id);
         var error = await _mediator.Send(command);
-        if (error != null)
-        {
-            return NotFound();
-        }
-
-        return Ok();
+        return error != null ? NotFound() : Ok();
     }
 }
