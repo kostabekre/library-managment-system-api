@@ -4,25 +4,11 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Books.Queries;
 
-internal sealed class GetAllBooksShortInfoHandler : IRequestHandler<GetAllBooksShortInfoQuery, Result<IEnumerable<BookShortInfo>>>
+internal sealed class GetAllBooksShortInfoHandler(IBookRepository bookRepository)
+    : IRequestHandler<GetAllBooksShortInfoQuery, IEnumerable<BookShortInfo>>
 {
-    private readonly IBookRepository _bookRepository;
-
-    public GetAllBooksShortInfoHandler(IBookRepository bookRepository)
+    public async ValueTask<IEnumerable<BookShortInfo>> Handle(GetAllBooksShortInfoQuery request, CancellationToken cancellationToken)
     {
-        _bookRepository = bookRepository;
-    }
-
-    public async ValueTask<Result<IEnumerable<BookShortInfo>>> Handle(GetAllBooksShortInfoQuery request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var result = await _bookRepository.GetAllBooksShortInfoAsync();
-            return new Result<IEnumerable<BookShortInfo>>(result);
-        }
-        catch (Exception e)
-        {
-            return new Error(500, new[]{e.Message});
-        }
+        return await bookRepository.GetAllBooksShortInfoAsync();
     }
 }

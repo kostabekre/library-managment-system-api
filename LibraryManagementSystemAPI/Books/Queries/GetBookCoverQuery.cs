@@ -4,4 +4,4 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Books.Queries;
 
-public record GetAllBooksShortInfoQuery() : IRequest<IEnumerable<BookShortInfo>>;
+public record GetBookCoverQuery(int Id) : IRequest<Result<BookCoverDTO?>>;

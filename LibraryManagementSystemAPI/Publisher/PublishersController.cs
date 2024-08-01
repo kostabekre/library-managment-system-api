@@ -69,7 +69,7 @@ public class PublishersController : ControllerBase
         
         var error = await _mediator.Send(command);
 
-        return error != null ? StatusCode(error.Code, error.Messages) : Ok();
+        return error != null ? StatusCode(error.Code, error) : Ok();
     }
     
 

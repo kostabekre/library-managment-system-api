@@ -2,6 +2,7 @@ using System.Text.Json;
 using LibraryManagementSystemAPI.Books.Commands;
 using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Books.Queries;
+using LibraryManagementSystemAPI.Models;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,28 +19,24 @@ public class BooksController : ControllerBase
         _mediator = mediator;
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet]
     [Route("all")]
     public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetAllBooksShortInfo()
     {
         var query = new GetAllBooksShortInfoQuery();
+        
         var result = await _mediator.Send(query);
-        if (result.IsFailure)
-        {
-            return StatusCode(result.Error!.Code, result.Error.Messages);
-        }
-        return Ok(result.Data);
+        
+        return Ok(result);
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetBooksShortInfo([FromQuery]BookParameters parameters)
     {
         var query = new GetAllBooksShortInfoPageListQuery(parameters);
         var result = await _mediator.Send(query);
-        if (result.IsFailure)
-        {
-            return StatusCode(result.Error!.Code, result.Error.Messages);
-        }
         
         var books = result.Data!;
         var metadata = new
@@ -56,110 +53,103 @@ public class BooksController : ControllerBase
         return Ok(books);
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult<BookInfo>> GetBook(int id)
     {
         var query = new GetBookQuery(id);
         var result = await _mediator.Send(query);
-        if (result.IsFailure)
-        {
-            return StatusCode(result.Error.Code, result.Error.Messages);
-        }
 
         var book = result.Data;
-        if (book == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(book);
+        
+        return book == null ? NotFound() : Ok(book);
     }
 
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
     [HttpPost]
     public async Task<ActionResult<int>> CreateBook(BookCreateDto bookDto)
     {
         var command = new CreateBookCommand(bookDto);
         var result = await _mediator.Send(command);
-        if (result.IsFailure)
-        {
-            return StatusCode(result.Error!.Code, result.Error.Messages);
-        }
-
-        return CreatedAtAction(nameof(GetBook), new { Id = result.Data }, result.Data);
+        return result.IsFailure
+            ? BadRequest(result.Error)
+            : CreatedAtAction(nameof(GetBook), new { Id = result.Data }, result.Data);
     }
     
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
     [HttpPost]
     [Route("cover")]
     public async Task<ActionResult> CreateBookWithCover(BookWithCoverCreateDto bookWithCover)
     {
         var command = new CreateBookWithCoverCommand(bookWithCover);
         var result = await _mediator.Send(command);
-        if (result.IsFailure)
-        {
-            return StatusCode(result.Error.Code, result.Error.Messages);
-        }
-
-        return CreatedAtAction(nameof(GetBook), new { Id = result.Data }, result.Data);
+        return result.IsFailure 
+            ? BadRequest(result.Error) 
+            : CreatedAtAction(nameof(GetBook), new { Id = result.Data }, result.Data);
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
     [HttpPut]
     [Route("{id}")]
     public async Task<ActionResult> UpdateBook(int id, BookUpdateDto book)
     {
         var command = new UpdateBookCommand(id, book);
+        
         var error = await _mediator.Send(command);
-        if (error != null)
-        {
-            return StatusCode(error.Code, error.Messages);
-        }
-
-        return Ok();
+        
+        return error != null ? StatusCode(error.Code, error) : Ok();
     }
     
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult> RemoveBook(int id)
     {
         var command = new RemoveBookCommand(id);
-        var error = await _mediator.Send(command);
         
-        if (error != null)
-        {
-            return StatusCode(error.Code, error.Messages);
-        }
+        var error = await _mediator.Send(command);
 
-        return Ok();
+        return error != null ? NotFound() : Ok();
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
     [HttpPut]
     [Route("amount/{id}")]
     public async Task<ActionResult> UpdateBookAmount(int id, [FromForm]int amount)
     {
         var command = new UpdateBookAmountCommand(id, amount);
+        
         var error = await _mediator.Send(command);
-        if (error != null)
-        {
-            return StatusCode(error.Code, error.Messages);
-        }
-
-        return Ok();
+        
+        return error != null ? StatusCode(error.Code, error) : Ok();
     }
     
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
     [HttpPut]
     [Route("rating/{id}")]
     public async Task<ActionResult> UpdateBookRating(int id, [FromForm]int rating)
     {
         var command = new UpdateBookRatingCommand(id, rating);
+        
         var error = await _mediator.Send(command);
-        if (error != null)
-        {
-            return StatusCode(error.Code, error.Messages);
-        }
-
-        return Ok();
+        
+        return error != null ? StatusCode(error.Code, error) : Ok();
     }
     
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
     [HttpPut]
     [Route("cover/{id}")]
     public async Task<ActionResult> UpdateCover(int id, IFormFile file)
@@ -170,23 +160,20 @@ public class BooksController : ControllerBase
 
         if (error != null)
         {
-            return StatusCode(error.Code, error.Messages);
+            return StatusCode(error.Code, error);
         }
 
         return Ok();
     }
     
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("cover/{id}")]
     public async Task<ActionResult> GetCover(int id)
     {
         var query = new GetBookCoverQuery(id);
         var result = await _mediator.Send(query);
-
-        if (result.IsFailure)
-        {
-            return StatusCode(result.Error.Code, result.Error.Messages);
-        }
 
         var bookCover = result.Data;
 

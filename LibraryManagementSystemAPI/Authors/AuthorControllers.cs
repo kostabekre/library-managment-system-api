@@ -42,7 +42,7 @@ public class AuthorsController : ControllerBase
     }
 
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
     [HttpPost]
     public async Task<ActionResult<AuthorFullInfo>> CreateAuthor(AuthorInfo info)
     {
@@ -70,7 +70,7 @@ public class AuthorsController : ControllerBase
     
 
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult> DeleteAuthor(int id)

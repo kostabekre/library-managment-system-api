@@ -162,13 +162,21 @@ public class EfCoreBookRepository : IBookRepository
 
         if (rowsUpdated > 0)
         {
-            return false;
+            return true;
         }
 
+        // Trying to create a row, if a book with the Id is created but no entry was inserted in BookCover table
         var bookCover = new BookCover() { BookId = id,  CoverFile = readen, Name = newName  };
         _bookContext.Set<BookCover>().Add(bookCover);
-        
-        await _bookContext.SaveChangesAsync();
+
+        try
+        {
+            await _bookContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException e) // when the book id is not present in Book table
+        {
+            return false;
+        }
 
         return true;
     }
@@ -185,10 +193,18 @@ public class EfCoreBookRepository : IBookRepository
             return false;
         }
         
+        // Trying to create a row, if a book with the Id is created but no entry was inserted in BookRating table
         var bookRating = new BookRating() { BookId = id,  Rating = rating };
         _bookContext.Set<BookRating>().Add(bookRating);
         
-        await _bookContext.SaveChangesAsync();
+        try
+        {
+            await _bookContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException e) // when the book id is not present in Book table
+        {
+            return false;
+        }
 
         return true;
     }
@@ -204,10 +220,18 @@ public class EfCoreBookRepository : IBookRepository
             return false;
         }
         
+        // Trying to create a row, if a book with the Id is created but no entry was inserted in BookAmount table
         var bookAmount = new BookAmount() { BookId = id,  Amount = amount};
         _bookContext.Set<BookAmount>().Add(bookAmount);
         
-        await _bookContext.SaveChangesAsync();
+        try
+        {
+            await _bookContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException e) // when the book id is not present in Book table
+        {
+            return false;
+        }
 
         return true;
     }
