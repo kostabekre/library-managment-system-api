@@ -56,7 +56,6 @@ public class GenresController : ControllerBase
     
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
     [HttpPost]
     public async Task<ActionResult<GenreFullInfo>> CreateGenre(GenreInfo info)
     {
@@ -65,7 +64,7 @@ public class GenresController : ControllerBase
         var result = await _mediator.Send(command);
         
         return result.IsFailure 
-            ? StatusCode(result.Error!.Code, result.Error) 
+            ? BadRequest(result.Error)
             : CreatedAtAction(nameof(GetGenre), new {result.Data!.Id}, result.Data);
     }
 }

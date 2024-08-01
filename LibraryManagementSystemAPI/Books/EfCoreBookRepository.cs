@@ -190,7 +190,7 @@ public class EfCoreBookRepository : IBookRepository
 
         if (rowsUpdated > 0)
         {
-            return false;
+            return true;
         }
         
         // Trying to create a row, if a book with the Id is created but no entry was inserted in BookRating table
@@ -217,7 +217,7 @@ public class EfCoreBookRepository : IBookRepository
                 parameters.SetProperty(r => r.Amount, amount));
         if (rowsUpdated > 0)
         {
-            return false;
+            return true;
         }
         
         // Trying to create a row, if a book with the Id is created but no entry was inserted in BookAmount table

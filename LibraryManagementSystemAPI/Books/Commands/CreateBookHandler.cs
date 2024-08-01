@@ -11,7 +11,7 @@ internal sealed class CreateBookHandler(IValidator<BookCreateDto> bookValidator,
 {
     public async ValueTask<Result<int>> Handle(CreateBookCommand request, CancellationToken cancellationToken)
     {
-        var validationResult = bookValidator.Validate(request.BookCreateDto);
+        var validationResult = await bookValidator.ValidateAsync(request.BookCreateDto);
         
         if (validationResult.IsValid == false)
         {

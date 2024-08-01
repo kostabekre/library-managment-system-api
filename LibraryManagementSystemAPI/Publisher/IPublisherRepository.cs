@@ -10,4 +10,5 @@ public interface IPublisherRepository
     Task<bool> DeletePublisherAsync(int id);
     Task<IEnumerable<PublisherFullInfo>> GetAllPublishersAsync();
     Task<bool> IsPublisherUniqueAsync(string name);
+    Task<bool> IsPublisherExistsAsync(int id);
 }

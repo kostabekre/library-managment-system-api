@@ -1,6 +1,7 @@
 using FluentValidation;
 using LibraryManagementSystemAPI.Authors;
 using LibraryManagementSystemAPI.Authors.Models;
+using LibraryManagementSystemAPI.Books.Commands;
 using LibraryManagementSystemAPI.Books.CoverValidation;
 using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Controllers;
@@ -20,6 +21,10 @@ public static class ValidatorExtensions
         serviceCollection.AddScoped<IValidator<AuthorInfo>, AuthorValidator>();
         serviceCollection.AddScoped<IValidator<CoverInfo>, BookCoverValidator>();
         serviceCollection.AddScoped<IValidator<BookCreateDto>, BookCreateDtoValidator>();
+        serviceCollection.AddScoped<IValidator<UpdateBookAmountCommand>, UpdateBookAmountCommandValidator>();
+        serviceCollection.AddScoped<IValidator<UpdateBookRatingCommand>, UpdateBookRatingCommandValidator>();
+        serviceCollection.AddScoped<IValidator<BookUpdateDto>, BookUpdateDtoValidator>();
+        
         return serviceCollection;
     }
 

@@ -9,4 +9,5 @@ public interface IGenreRepository
     Task<IEnumerable<GenreFullInfo>> GetAllGenreAsync();
     Task<bool> RemoveGenreAsync(int id);
     Task<bool> IsNameUniqueAsync(string name);
+    Task<bool> AreGenresExistAsync(int[] ids);
 }

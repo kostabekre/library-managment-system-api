@@ -16,6 +16,13 @@ public class EfCorePublisherRepository : IPublisherRepository
     public async Task<bool> IsPublisherUniqueAsync(string name) => await _bookContext
         .Publishers
         .AnyAsync(p => p.Name == name) == false;
+
+    public async Task<bool> IsPublisherExistsAsync(int id)
+    {
+        var existingId =  await _bookContext.Publishers.Where(p => p.Id == id).Select(a => a.Id).FirstOrDefaultAsync();
+        return existingId == id;
+    }
+
     public async Task<PublisherFullInfo?> GetPublisherAsync(int id)
     {
         var publisher = await _bookContext.Publishers

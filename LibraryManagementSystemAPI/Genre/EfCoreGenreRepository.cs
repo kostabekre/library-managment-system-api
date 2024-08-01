@@ -48,4 +48,11 @@ public class EfCoreGenreRepository : IGenreRepository
 
     public async Task<bool> IsNameUniqueAsync(string name) =>
         await _bookContext.Genres.AnyAsync(g => g.Name == name) == false;
+
+    public async Task<bool> AreGenresExistAsync(int[] ids)
+    {
+        var validIds = await _bookContext.Genres.Where(a => ids.Contains(a.Id)).Select(a => a.Id).ToListAsync();
+
+        return ids.Length == validIds.Count;
+    }
 }

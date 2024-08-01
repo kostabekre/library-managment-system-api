@@ -15,9 +15,14 @@ public class EfCoreAuthorRepository : IAuthorRepository
 
     public async Task<AuthorFullInfo?> GetAuthorAsync(int id)
     {
-        var author = await _bookContext.Authors
+        Author? author = await _bookContext.Authors
             .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (author == null)
+        {
+            return null;
+        }
         
         return (AuthorFullInfo)author;
     }
@@ -58,4 +63,10 @@ public class EfCoreAuthorRepository : IAuthorRepository
     public async Task<bool> IsNameUniqueAsync(string name) => await _bookContext
         .Authors.AnyAsync(a => a.Name == name) == false;
 
+    public async Task<bool> AreAuthorsExistAsync(int[] ids)
+    {
+        var validIds = await _bookContext.Authors.Where(a => ids.Contains(a.Id)).Select(a => a.Id).ToListAsync();
+
+        return validIds.Count == ids.Length;
+    }
 }

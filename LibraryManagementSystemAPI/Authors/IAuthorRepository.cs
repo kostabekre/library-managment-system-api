@@ -10,4 +10,5 @@ public interface IAuthorRepository
     Task<bool> UpdateAuthorAsync(int id, AuthorInfo author);
     Task<IEnumerable<AuthorFullInfo>> GetAllAuthorsAsync();
     Task<bool> IsNameUniqueAsync(string name);
+    Task<bool> AreAuthorsExistAsync(int[] ids);
 }
