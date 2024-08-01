@@ -3,23 +3,13 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Publisher.Commands;
 
-internal sealed class DeletePublisherHandler : IRequestHandler<DeletePublisherCommand, Error?>
+internal sealed class DeletePublisherHandler(IPublisherRepository publisherRepository)
+    : IRequestHandler<DeletePublisherCommand, Error?>
 {
-    private readonly IPublisherRepository _publisherRepository;
-
-    public DeletePublisherHandler(IPublisherRepository publisherRepository)
-    {
-        _publisherRepository = publisherRepository;
-    }
-
     public async ValueTask<Error?> Handle(DeletePublisherCommand request, CancellationToken cancellationToken)
     {
-        bool deleted = await _publisherRepository.DeletePublisherAsync(request.Id);
-        if (deleted == false)
-        {
-            return new Error(404, new []{"Not Found"});
-        }
-
-        return null;
+        bool deleted = await publisherRepository.DeletePublisherAsync(request.Id);
+        
+        return deleted == false ? Error.NotFound() : null;
     }
 }

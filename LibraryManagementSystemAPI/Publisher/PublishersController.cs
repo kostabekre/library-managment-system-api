@@ -1,3 +1,4 @@
+using LibraryManagementSystemAPI.Models;
 using LibraryManagementSystemAPI.Publisher.Commands;
 using LibraryManagementSystemAPI.Publisher.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ public class PublishersController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<PublisherFullInfo>>> GetAllPublishers()
     {
         var query = new GetAllPublishersQuery();
@@ -25,27 +27,30 @@ public class PublishersController : ControllerBase
     }
     
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Route("{id}")]
     public async Task<ActionResult<PublisherFullInfo>> GetPublisher(int id)
     {
         var query = new GetPublisherQuery(id);
+        
         var publisher = await _mediator.Send(query);
-        if (publisher == null)
-        {
-            return NotFound();
-        }
-        return Ok(publisher);
+        
+        return publisher == null ? NotFound() : Ok(publisher);
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PublisherFullInfo>> CreatePublisher(PublisherInfo info)
     {
         var command = new CreatePublisherCommand(info);
+        
         var result = await _mediator.Send(command);
         
         if (result.IsFailure)
         {
-            return StatusCode(result.Error!.Code, result.Error.Messages);
+            return BadRequest(result.Error);
         }
 
         PublisherFullInfo fullInfo = result.Data!;
@@ -54,32 +59,30 @@ public class PublishersController : ControllerBase
     }
 
     [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
     [Route("{id}")]
     public async Task<ActionResult> UpdatePublisher(int id, PublisherInfo info)
     {
         var command = new UpdatePublisherCommand(id, info);
+        
         var error = await _mediator.Send(command);
 
-        if (error != null)
-        {
-            return StatusCode(error.Code, error.Messages);
-        }
-
-        return Ok();
+        return error != null ? StatusCode(error.Code, error.Messages) : Ok();
     }
     
 
     [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Route("{id}")]
     public async Task<ActionResult> DeletePublisher(int id)
     {
         var command = new DeletePublisherCommand(id);
+        
         var error = await _mediator.Send(command);
-        if (error != null)
-        {
-            return NotFound();
-        }
-
-        return Ok();
+        
+        return error != null ? NotFound() : Ok();
     }
 }

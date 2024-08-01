@@ -7,6 +7,7 @@ using LibraryManagementSystemAPI.Controllers;
 using LibraryManagementSystemAPI.Genre;
 using LibraryManagementSystemAPI.Genre.Data;
 using LibraryManagementSystemAPI.Publisher.Data;
+using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace LibraryManagementSystemAPI.Validators;
 
@@ -21,4 +22,6 @@ public static class ValidatorExtensions
         serviceCollection.AddScoped<IValidator<BookCreateDto>, BookCreateDtoValidator>();
         return serviceCollection;
     }
+
+    public static List<string> GetErrorMessages(this ValidationResult validationResult) => validationResult.Errors.Select(e => e.ErrorMessage).ToList();
 }

@@ -1,29 +1,24 @@
 using FluentValidation;
 using LibraryManagementSystemAPI.Models;
 using LibraryManagementSystemAPI.Publisher.Data;
+using LibraryManagementSystemAPI.Validators;
 using Mediator;
 
 namespace LibraryManagementSystemAPI.Publisher.Commands;
 
-internal sealed class CreatePublisherHandler : IRequestHandler<CreatePublisherCommand, Result<PublisherFullInfo>>
+internal sealed class CreatePublisherHandler(
+    IValidator<PublisherInfo> validator,
+    IPublisherRepository publisherRepository)
+    : IRequestHandler<CreatePublisherCommand, Result<PublisherFullInfo>>
 {
-    private readonly IValidator<PublisherInfo> _validator;
-    private readonly IPublisherRepository _publisherRepository;
-
-    public CreatePublisherHandler(IValidator<PublisherInfo> validator, IPublisherRepository publisherRepository)
-    {
-        _validator = validator;
-        _publisherRepository = publisherRepository;
-    }
-
     public async ValueTask<Result<PublisherFullInfo>> Handle(CreatePublisherCommand request, CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(request.Info);
+        var validationResult = await validator.ValidateAsync(request.Info, cancellationToken);
         if (validationResult.IsValid == false)
         {
-            return new Error(401, validationResult.Errors.Select(e => e.ErrorMessage).ToList());
+            return Error.BadRequest(validationResult.GetErrorMessages());
         }
         
-        return  await _publisherRepository.CreatePublisherAsync(request.Info);
+        return  await publisherRepository.CreatePublisherAsync(request.Info);
     }
 }
