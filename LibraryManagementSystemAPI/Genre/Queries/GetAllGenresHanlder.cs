@@ -3,17 +3,11 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Genre.Queries;
 
-internal sealed class GetAllGenresHanlder : IRequestHandler<GetAllGenresQuery, IEnumerable<GenreFullInfo>>
+internal sealed class GetAllGenresHanlder(IGenreRepository genreRepository)
+    : IRequestHandler<GetAllGenresQuery, IEnumerable<GenreFullInfo>>
 {
-    private readonly IGenreRepository _genreRepository;
-
-    public GetAllGenresHanlder(IGenreRepository genreRepository)
-    {
-        _genreRepository = genreRepository;
-    }
-
     public async ValueTask<IEnumerable<GenreFullInfo>> Handle(GetAllGenresQuery request, CancellationToken cancellationToken)
     {
-        return await _genreRepository.GetAllGenreAsync();
+        return await genreRepository.GetAllGenreAsync();
     }
 }

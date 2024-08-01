@@ -10,7 +10,7 @@ namespace LibraryManagementSystemAPI.Publisher;
 [Route("api/[controller]")]
 public class PublishersController : ControllerBase
 {
-    private IMediator _mediator;
+    private readonly IMediator _mediator;
 
     public PublishersController(IMediator mediator)
     {

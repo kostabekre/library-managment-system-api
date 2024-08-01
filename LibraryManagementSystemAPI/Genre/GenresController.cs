@@ -2,6 +2,7 @@ using FluentValidation;
 using LibraryManagementSystemAPI.Genre.Commands;
 using LibraryManagementSystemAPI.Genre.Data;
 using LibraryManagementSystemAPI.Genre.Queries;
+using LibraryManagementSystemAPI.Models;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +12,7 @@ namespace LibraryManagementSystemAPI.Genre;
 [Route("api/[controller]")]
 public class GenresController : ControllerBase
 {
-    private IMediator _mediator;
+    private readonly IMediator _mediator;
 
     public GenresController(IMediator mediator)
     {
@@ -19,31 +20,31 @@ public class GenresController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Route("{id}")]
     public async Task<ActionResult<GenreFullInfo>> GetGenre(int id)
     {
         var query = new GetGenreQuery(id);
+        
         var genre = await _mediator.Send(query);
-        if (genre == null)
-        {
-            return NotFound();
-        }
-        return Ok(genre);
+        
+        return genre == null ? NotFound() : Ok(genre);
     }
     
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpDelete]
     public async Task<ActionResult> RemoveGenre(int id)
     {
         var command = new RemoveGenreCommand(id);
-        var error = await _mediator.Send(command);
-        if (error != null)
-        {
-            return NotFound();
-        }
         
-        return Ok();
+        var error = await _mediator.Send(command);
+        
+        return error != null ? NotFound() : Ok();
     }
     
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet]
     [Route("get_all")]
     public async Task<ActionResult<IEnumerable<GenreFullInfo>>> GetAllGenres()
@@ -53,15 +54,18 @@ public class GenresController : ControllerBase
         return Ok(genres);
     }
     
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
     [HttpPost]
     public async Task<ActionResult<GenreFullInfo>> CreateGenre(GenreInfo info)
     {
         var command = new CreateGenreCommand(info);
+        
         var result = await _mediator.Send(command);
-        if (result.IsFailure)
-        {
-            return StatusCode(result.Error!.Code, result.Error.Messages);
-        }
-        return CreatedAtAction(nameof(GetGenre), new {result.Data!.Id}, result.Data);
+        
+        return result.IsFailure 
+            ? StatusCode(result.Error!.Code, result.Error) 
+            : CreatedAtAction(nameof(GetGenre), new {result.Data!.Id}, result.Data);
     }
 }

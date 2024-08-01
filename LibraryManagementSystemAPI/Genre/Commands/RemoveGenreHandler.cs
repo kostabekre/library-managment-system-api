@@ -3,24 +3,12 @@ using Mediator;
 
 namespace LibraryManagementSystemAPI.Genre.Commands;
 
-internal sealed class RemoveGenreHandler : IRequestHandler<RemoveGenreCommand, Error?>
+internal sealed class RemoveGenreHandler(IGenreRepository genreRepository) : IRequestHandler<RemoveGenreCommand, Error?>
 {
-    private readonly IGenreRepository _genreRepository;
-
-    public RemoveGenreHandler(IGenreRepository genreRepository)
-    {
-        _genreRepository = genreRepository;
-    }
-
     public async ValueTask<Error?> Handle(RemoveGenreCommand request, CancellationToken cancellationToken)
     {
-        var deleted = await _genreRepository.RemoveGenreAsync(request.Id);
+        var deleted = await genreRepository.RemoveGenreAsync(request.Id);
 
-        if (deleted == false)
-        {
-            return new Error(404, new []{"Not Found"});
-        }
-
-        return null;
+        return deleted == false ? Error.NotFound() : null;
     }
 }
