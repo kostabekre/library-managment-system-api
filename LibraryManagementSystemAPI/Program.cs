@@ -31,6 +31,8 @@ if (app.Environment.IsDevelopment())
     app.UseSeedDb();
 }
 
+app.AddCoverValidationCheck();
+
 app.UseHttpsRedirection();
 
 app.UseRouting();

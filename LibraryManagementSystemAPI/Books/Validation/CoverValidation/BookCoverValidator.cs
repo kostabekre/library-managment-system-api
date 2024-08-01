@@ -24,11 +24,11 @@ public class BookCoverValidator : AbstractValidator<CoverInfo>
         }
     };
     
-    private readonly CoverValidationValues _validationValues;
+    private readonly CoverValidationOptions _validationOptions;
 
-    public BookCoverValidator(IOptions<CoverValidationValues> validationValues)
+    public BookCoverValidator(IOptions<CoverValidationOptions> validationValues)
     {
-        _validationValues = validationValues.Value;
+        _validationOptions = validationValues.Value;
         
         RuleFor(c => c.File)
             .Cascade(CascadeMode.Stop)
@@ -70,7 +70,7 @@ public class BookCoverValidator : AbstractValidator<CoverInfo>
 
     private bool BeNotMoreMaxSize(IFormFile file)
     {
-        return file.Length < _validationValues.MaxSize;
+        return file.Length < _validationOptions.MaxSize;
     }
 
     private bool HaveImageExtension(IFormFile file)
