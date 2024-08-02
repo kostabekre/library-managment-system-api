@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryManagementSystemAPI", "LibraryManagementSystemAPI\LibraryManagementSystemAPI.csproj", "{92FF0D2F-503B-43D7-BF5A-56676CB8D30E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LmsApiTests", "LmsApiTests\LmsApiTests.csproj", "{3B1D05DE-4ED1-4381-A171-12C897E2CBEF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{92FF0D2F-503B-43D7-BF5A-56676CB8D30E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92FF0D2F-503B-43D7-BF5A-56676CB8D30E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92FF0D2F-503B-43D7-BF5A-56676CB8D30E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B1D05DE-4ED1-4381-A171-12C897E2CBEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B1D05DE-4ED1-4381-A171-12C897E2CBEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B1D05DE-4ED1-4381-A171-12C897E2CBEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B1D05DE-4ED1-4381-A171-12C897E2CBEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
