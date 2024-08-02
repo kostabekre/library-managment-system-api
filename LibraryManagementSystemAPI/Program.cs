@@ -1,5 +1,6 @@
 using LibraryManagementSystemAPI.Books.CoverValidation;
 using LibraryManagementSystemAPI.Context;
+using LibraryManagementSystemAPI.Exceptions;
 using LibraryManagementSystemAPI.Repository;
 using LibraryManagementSystemAPI.Seed;
 using LibraryManagementSystemAPI.Validators;
@@ -21,6 +22,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddSeedDb();
+builder.AddGlobalExceptionHandler();
 
 var app = builder.Build();
 
@@ -29,6 +31,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseSeedDb();
+}
+else
+{
+    app.UseExceptionHandler();
 }
 
 app.AddCoverValidationCheck();
