@@ -1,12 +1,11 @@
-using System.Collections.Immutable;
 using LibraryManagementSystemAPI.Authors.Models;
 using LibraryManagementSystemAPI.Books.Data;
-using LibraryManagementSystemAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementSystemAPI.Context;
 
-public class BookContext : DbContext
+public class BookContext : IdentityDbContext
 {
     public BookContext(DbContextOptions options) : base(options){ }
     

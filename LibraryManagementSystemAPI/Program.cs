@@ -4,7 +4,10 @@ using LibraryManagementSystemAPI.Exceptions;
 using LibraryManagementSystemAPI.Repository;
 using LibraryManagementSystemAPI.Seed;
 using LibraryManagementSystemAPI.Validators;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +22,22 @@ builder.Services.AddValidators();
 builder.Services.AddRepositories();
 builder.Services.AddCoverValidationValues(builder);
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
 builder.Services.AddControllers();
 builder.Services.AddSeedDb();
 builder.AddGlobalExceptionHandler();
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+    .AddEntityFrameworkStores<BookContext>();
 
 var app = builder.Build();
 
@@ -44,5 +59,9 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.MapControllers();
+
+app.MapIdentityApi<IdentityUser>();
+
+app.UseAuthorization();
 
 app.Run();
