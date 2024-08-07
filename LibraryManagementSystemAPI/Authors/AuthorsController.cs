@@ -4,11 +4,13 @@ using LibraryManagementSystemAPI.Authors.Models;
 using LibraryManagementSystemAPI.Authors.Queries;
 using LibraryManagementSystemAPI.Models;
 using Mediator;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystemAPI.Authors;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class AuthorsController : ControllerBase
 {
@@ -19,8 +21,9 @@ public class AuthorsController : ControllerBase
         _mediator = mediator;
     }
 
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<AuthorFullInfo>>> GetAllAuthors()
     {
         var query = new GetAllAuthorsQuery();
@@ -30,9 +33,10 @@ public class AuthorsController : ControllerBase
         return Ok(authors);
     }
     
+    [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult<AuthorFullInfo>> GetAuthor(int id)
     {

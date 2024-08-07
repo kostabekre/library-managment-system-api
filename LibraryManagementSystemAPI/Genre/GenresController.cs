@@ -4,11 +4,13 @@ using LibraryManagementSystemAPI.Genre.Data;
 using LibraryManagementSystemAPI.Genre.Queries;
 using LibraryManagementSystemAPI.Models;
 using Mediator;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystemAPI.Genre;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class GenresController : ControllerBase
 {
@@ -20,6 +22,7 @@ public class GenresController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Route("{id}")]

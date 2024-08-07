@@ -4,11 +4,13 @@ using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Books.Queries;
 using LibraryManagementSystemAPI.Models;
 using Mediator;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystemAPI.Books;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
@@ -19,9 +21,10 @@ public class BooksController : ControllerBase
         _mediator = mediator;
     }
 
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet]
+    [AllowAnonymous]
     [Route("all")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetAllBooksShortInfo()
     {
         var query = new GetAllBooksShortInfoQuery();
@@ -31,8 +34,9 @@ public class BooksController : ControllerBase
         return Ok(result);
     }
 
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [AllowAnonymous]
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetBooksShortInfo([FromQuery]BookParameters parameters)
     {
         var query = new GetAllBooksShortInfoPageListQuery(parameters);
@@ -53,6 +57,7 @@ public class BooksController : ControllerBase
         return Ok(books);
     }
 
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
@@ -166,6 +171,7 @@ public class BooksController : ControllerBase
         return Ok();
     }
     
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]

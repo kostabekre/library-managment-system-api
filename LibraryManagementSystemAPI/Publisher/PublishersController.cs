@@ -3,10 +3,12 @@ using LibraryManagementSystemAPI.Publisher.Commands;
 using LibraryManagementSystemAPI.Publisher.Data;
 using Microsoft.AspNetCore.Mvc;
 using Mediator;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryManagementSystemAPI.Publisher;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class PublishersController : ControllerBase
 {
@@ -18,6 +20,7 @@ public class PublishersController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<PublisherFullInfo>>> GetAllPublishers()
     {
@@ -27,6 +30,7 @@ public class PublishersController : ControllerBase
     }
     
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Route("{id}")]
