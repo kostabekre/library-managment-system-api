@@ -38,6 +38,19 @@ builder.AddGlobalExceptionHandler();
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<BookContext>();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddDefaultPolicy(policyBuilder =>
+        {
+            policyBuilder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(_ => true);
+        });
+    });
+}
 
 var app = builder.Build();
 
@@ -58,10 +71,12 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.MapControllers();
+app.UseCors();
 
 app.MapIdentityApi<IdentityUser>();
 
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();

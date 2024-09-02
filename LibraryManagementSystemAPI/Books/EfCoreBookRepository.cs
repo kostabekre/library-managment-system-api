@@ -21,7 +21,7 @@ public class EfCoreBookRepository : IBookRepository
         .AsNoTracking()
         .Include(b => b.Publisher)
         .Include(b => b.Authors)
-        .Select(b => new BookShortInfo(b.Id, b.Name,b.Authors!.First().Name, b.Publisher!.Name))
+        .Select(b => new BookShortInfo(b.Id, b.Name,b.Authors!.First().Name))
         .ToListAsync();
 
     public async Task<PagedList<BookShortInfo>> GetBooksShortInfoAsync(BookParameters parameters)
@@ -33,7 +33,7 @@ public class EfCoreBookRepository : IBookRepository
             .Take(parameters.PageSize)
             .Include(b => b.Authors)
             .Include(b => b.Publisher)
-            .Select(b => new BookShortInfo(b.Id, b.Name, b.Authors!.First().Name, b.Publisher!.Name))
+            .Select(b => new BookShortInfo(b.Id, b.Name, b.Authors!.First().Name))
             .ToListAsync();
 
         return new PagedList<BookShortInfo>(result, parameters.PageSize, parameters.PageNumber, result.Count);
