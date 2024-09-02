@@ -1,4 +1,4 @@
-# Library management System
+# Library management System API
 
 It's my personal project that allows me to improve my skills.
 
@@ -21,7 +21,7 @@ It's my personal project that allows me to improve my skills.
 - [x] CRUD operations for publishers, genres, authors and books.
 - [x] Authentication & Authorization;
 - [x] Swagger documentation;
-- [ ] Tests;
-- [ ] Docker;
-- [ ] Simple UI;
+- [x] Tests;
+- [x] Docker;
+- [x] Simple UI;
 - [ ] Message Bus.
