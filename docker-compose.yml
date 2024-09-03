@@ -1,5 +1,5 @@
 ﻿services:
-  library_management_system_api:
+  api:
     image: library_management_system_api
     build:
       context: .
@@ -9,6 +9,8 @@
       - "8081:8081"
     depends_on:
       - library-db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
 
   library-db:
     image: postgres:latest
