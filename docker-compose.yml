@@ -1,6 +1,5 @@
 ﻿services:
   api:
-    image: library_management_system_api
     build:
       context: .
       dockerfile: LibraryManagementSystemAPI/Dockerfile
