@@ -36,6 +36,18 @@ public class BooksController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet]
+    [Route("author/{authorId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetAllBooksShortInfoByAuthor(int authorId)
+    {
+        var query = new GetAllBooksShortInfoByAuthorQuery(authorId);
+        var result = await _mediator.Send(query);
+        
+        return Ok(result);
+    }
+    
+    [AllowAnonymous]
+    [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetBooksShortInfo([FromQuery]BookParameters parameters)
     {

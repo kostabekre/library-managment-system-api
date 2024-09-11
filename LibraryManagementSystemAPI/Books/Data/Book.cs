@@ -10,7 +10,7 @@ public class Book
     public string ISBN { get; set; } = Guid.NewGuid().ToString();
     public BookCover? Cover { get; set; }
     public IEnumerable<BookAuthor>? BookAuthors { get; set; }
-    public IEnumerable<Author>? Authors { get; set; }
+    public IEnumerable<Author> Authors { get; set; } = null!;
     public int PublisherId { get; set; }
     public Publisher.Data.Publisher? Publisher { get; set; }
     public IEnumerable<BookGenre>? BookGenres { get; set; }

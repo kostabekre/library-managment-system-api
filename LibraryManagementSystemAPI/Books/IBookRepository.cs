@@ -6,6 +6,7 @@ namespace LibraryManagementSystemAPI.Books;
 
 public interface IBookRepository
 {
+    Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoByAuthorIdAsync(int authorId);
     Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoAsync();
     Task<PagedList<BookShortInfo>> GetBooksShortInfoAsync(BookParameters parameters);
     Task<int> CreateBookAsync(BookCreateDto model);
