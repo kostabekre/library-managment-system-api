@@ -18,6 +18,14 @@ public class EfCoreBookRepository : IBookRepository
         _bookContext = bookContext;
     }
 
+    public async Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoByPublisherIdAsync(int publisherId) => await _bookContext.Books
+        .AsNoTracking()
+        .Include(b => b.Publisher)
+        .Include(b => b.Authors)
+        .Where(b => b.Publisher.Id == publisherId)
+        .Select(b => new BookShortInfo(b.Id, b.Name, new AuthorShortInfo(b.Authors!.First().Id, b.Authors!.First().Name)))
+        .ToListAsync();
+
     public async Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoByAuthorIdAsync(int authorId) => await _bookContext.Books
         .AsNoTracking()
         .Include(b => b.Publisher)
