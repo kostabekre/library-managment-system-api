@@ -44,9 +44,10 @@ if (builder.Environment.IsDevelopment())
     {
         options.AddDefaultPolicy(policyBuilder =>
         {
-            policyBuilder.AllowAnyOrigin()
+            policyBuilder.WithOrigins("http://localhost:3000")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
+                .AllowCredentials()
                 .SetIsOriginAllowed(_ => true);
         });
     });
