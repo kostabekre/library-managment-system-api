@@ -1,6 +1,7 @@
 using LibraryManagementSystemAPI.Books.CoverValidation;
 using LibraryManagementSystemAPI.Context;
 using LibraryManagementSystemAPI.Exceptions;
+using LibraryManagementSystemAPI.Identity;
 using LibraryManagementSystemAPI.Repository;
 using LibraryManagementSystemAPI.Seed;
 using LibraryManagementSystemAPI.Validators;
@@ -75,6 +76,7 @@ app.UseRouting();
 app.UseCors();
 
 app.MapIdentityApi<IdentityUser>();
+app.MapLogout();
 
 app.UseAuthorization();
 
