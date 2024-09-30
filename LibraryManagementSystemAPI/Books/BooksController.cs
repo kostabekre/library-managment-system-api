@@ -166,6 +166,20 @@ public class BooksController : ControllerBase
     [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
     [HttpPut]
+    [Route("name/{id}")]
+    public async Task<ActionResult> UpdateBookName(int id, [FromForm]string name)
+    {
+        var command = new UpdateBookNameCommand(name, id);
+        
+        var error = await _mediator.Send(command);
+        
+        return error != null ? StatusCode(error.Code, error) : Ok();
+    }
+    
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
+    [HttpPut]
     [Route("rating/{id}")]
     public async Task<ActionResult> UpdateBookRating(int id, [FromForm]int rating)
     {

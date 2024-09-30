@@ -226,6 +226,16 @@ public class EfCoreBookRepository : IBookRepository
         return true;
     }
 
+    public async Task<bool> UpdateBookNameAsyns(int id, string newName)
+    {
+        int rowsUpdated  = await _bookContext.Books
+            .Where(book => book.Id == id)
+            .ExecuteUpdateAsync(parameters => 
+                parameters.SetProperty(c => c.Name, newName));
+
+        return rowsUpdated > 0;
+    }
+
     public async Task<bool> UpdateBookAmountAsync(int id, int amount)
     {
         int rowsUpdated = await _bookContext.Set<BookAmount>()

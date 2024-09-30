@@ -18,5 +18,6 @@ public interface IBookRepository
     Task<BookCoverDTO?> GetCoverAsync(int id);
     Task<bool> UpdateCoverAsync(int id, IFormFile file);
     Task<bool> UpdateBookRatingAsync(int id, int rating);
+    Task<bool> UpdateBookNameAsyns(int id, string newName);
     Task<bool> UpdateBookAmountAsync(int id, int amount);
 }
