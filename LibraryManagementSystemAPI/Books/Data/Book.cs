@@ -8,6 +8,7 @@ public class Book
     public int Id { get; set; }
     public string Name { get; set; }
     public string ISBN { get; set; } = Guid.NewGuid().ToString();
+    public string? Description { get; set; }
     public BookCover? Cover { get; set; }
     public IEnumerable<BookAuthor>? BookAuthors { get; set; }
     public IEnumerable<Author> Authors { get; set; } = null!;

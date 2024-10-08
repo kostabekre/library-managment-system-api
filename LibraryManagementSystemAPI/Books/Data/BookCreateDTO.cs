@@ -4,6 +4,7 @@ public class BookCreateDto
 {
     public string Name { get; set; } = null!;
     public string Isbn { get; set; }
+    public string? Description { get; set; }
 
     public int[] AuthorsId { get; set; } = null!;
     public int PublisherId { get; set; }
@@ -18,6 +19,7 @@ public class BookCreateDto
         {
             Name = dto.Name,
             ISBN = dto.Isbn,
+            Description = dto.Description,
             PublisherId = dto.PublisherId,
             DatePublished = dto.DatePublished,
             Amount = new BookAmount(){Amount = dto.BookAmount},

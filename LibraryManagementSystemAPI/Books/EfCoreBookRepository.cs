@@ -131,6 +131,7 @@ public class EfCoreBookRepository : IBookRepository
         }
         
         book.Name = bookDto.Name;
+        book.Description = bookDto.Description;
         
         if (book.BookGenres != null)
         {
