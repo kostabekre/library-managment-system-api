@@ -21,7 +21,7 @@ public class BookCreateDtoValidator : AbstractValidator<BookCreateDto>
 
         RuleFor(b => b.BookRating)
             .GreaterThanOrEqualTo(0).WithMessage("Rating cannot be less than 0!")
-            .LessThanOrEqualTo(10).WithMessage("Rating cannot be more than 10!");
+            .LessThanOrEqualTo(5).WithMessage("Rating cannot be more than 5!");
 
         RuleFor(b => b.AuthorsId)
             .Cascade(CascadeMode.Stop)
