@@ -21,7 +21,5 @@ It's my personal project that allows me to improve my skills.
 - [x] CRUD operations for publishers, genres, authors and books.
 - [x] Authentication & Authorization;
 - [x] Swagger documentation;
-- [x] Tests;
 - [x] Docker;
-- [x] Simple UI;
-- [ ] Message Bus.
+- [x] [Simple UI](https://github.com/kostabekre/library_management_front);
