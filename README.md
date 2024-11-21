@@ -21,7 +21,5 @@ It's my personal project that allows me to improve my skills.
 - [x] CRUD operations for publishers, genres, authors and books.
 - [x] Authentication & Authorization;
 - [x] Swagger documentation;
-- [ ] Tests;
-- [ ] Docker;
-- [ ] Simple UI;
-- [ ] Message Bus.
+- [x] Docker;
+- [x] Simple UI;
