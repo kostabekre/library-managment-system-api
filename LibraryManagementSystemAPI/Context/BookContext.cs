@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using LibraryManagementSystemAPI.Authors.Models;
 using LibraryManagementSystemAPI.Books.Data;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -7,6 +8,13 @@ namespace LibraryManagementSystemAPI.Context;
 
 public class BookContext : IdentityDbContext
 {
+    [ModuleInitializer]
+    public static void Initialize()
+    {
+        // TODO replace all local Datetime to Utc
+        // https://stackoverflow.com/questions/69961449/net6-and-datetime-problem-cannot-write-datetime-with-kind-utc-to-postgresql-ty/70142836#70142836
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
     public BookContext(DbContextOptions options) : base(options){ }
     
     public DbSet<Book> Books { get; init; }

@@ -23,6 +23,7 @@ public static class ValidatorExtensions
         serviceCollection.AddScoped<IValidator<BookCreateDto>, BookCreateDtoValidator>();
         serviceCollection.AddScoped<IValidator<UpdateBookAmountCommand>, UpdateBookAmountCommandValidator>();
         serviceCollection.AddScoped<IValidator<UpdateBookRatingCommand>, UpdateBookRatingCommandValidator>();
+        serviceCollection.AddScoped<IValidator<UpdateBookNameCommand>, UpdateBookNameCommandValidator>();
         serviceCollection.AddScoped<IValidator<BookUpdateDto>, BookUpdateDtoValidator>();
         
         return serviceCollection;

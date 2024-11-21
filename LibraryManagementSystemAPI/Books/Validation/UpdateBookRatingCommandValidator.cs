@@ -9,6 +9,6 @@ public class UpdateBookRatingCommandValidator : AbstractValidator<UpdateBookRati
     {
         RuleFor(c => c.Rating)
             .GreaterThanOrEqualTo(0)
-            .LessThanOrEqualTo(10);
+            .LessThanOrEqualTo(5);
     }
 }

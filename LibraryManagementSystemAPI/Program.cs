@@ -1,6 +1,7 @@
 using LibraryManagementSystemAPI.Books.CoverValidation;
 using LibraryManagementSystemAPI.Context;
 using LibraryManagementSystemAPI.Exceptions;
+using LibraryManagementSystemAPI.Identity;
 using LibraryManagementSystemAPI.Repository;
 using LibraryManagementSystemAPI.Seed;
 using LibraryManagementSystemAPI.Validators;
@@ -38,6 +39,20 @@ builder.AddGlobalExceptionHandler();
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<BookContext>();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddDefaultPolicy(policyBuilder =>
+        {
+            policyBuilder.WithOrigins("http://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .SetIsOriginAllowed(_ => true);
+        });
+    });
+}
 
 var app = builder.Build();
 
@@ -58,10 +73,13 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.MapControllers();
+app.UseCors();
 
 app.MapIdentityApi<IdentityUser>();
+app.MapLogout();
 
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();

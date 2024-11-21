@@ -6,6 +6,8 @@ namespace LibraryManagementSystemAPI.Books;
 
 public interface IBookRepository
 {
+    Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoByPublisherIdAsync(int publisherId);
+    Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoByAuthorIdAsync(int authorId);
     Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoAsync();
     Task<PagedList<BookShortInfo>> GetBooksShortInfoAsync(BookParameters parameters);
     Task<int> CreateBookAsync(BookCreateDto model);
@@ -16,5 +18,6 @@ public interface IBookRepository
     Task<BookCoverDTO?> GetCoverAsync(int id);
     Task<bool> UpdateCoverAsync(int id, IFormFile file);
     Task<bool> UpdateBookRatingAsync(int id, int rating);
+    Task<bool> UpdateBookNameAsyns(int id, string newName);
     Task<bool> UpdateBookAmountAsync(int id, int amount);
 }

@@ -36,6 +36,30 @@ public class BooksController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet]
+    [Route("publisher/{publisherId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetAllBooksShortInfoByPublisher(int publisherId)
+    {
+        var query = new GetAllBooksShortInfoByAuthorQuery(publisherId);
+        var result = await _mediator.Send(query);
+        
+        return Ok(result);
+    }
+    
+    [AllowAnonymous]
+    [HttpGet]
+    [Route("author/{authorId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetAllBooksShortInfoByAuthor(int authorId)
+    {
+        var query = new GetAllBooksShortInfoByAuthorQuery(authorId);
+        var result = await _mediator.Send(query);
+        
+        return Ok(result);
+    }
+    
+    [AllowAnonymous]
+    [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<BookShortInfo>>> GetBooksShortInfo([FromQuery]BookParameters parameters)
     {
@@ -132,6 +156,20 @@ public class BooksController : ControllerBase
     public async Task<ActionResult> UpdateBookAmount(int id, [FromForm]int amount)
     {
         var command = new UpdateBookAmountCommand(id, amount);
+        
+        var error = await _mediator.Send(command);
+        
+        return error != null ? StatusCode(error.Code, error) : Ok();
+    }
+    
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<Error>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Error>(StatusCodes.Status404NotFound)]
+    [HttpPut]
+    [Route("name/{id}")]
+    public async Task<ActionResult> UpdateBookName(int id, [FromForm]string name)
+    {
+        var command = new UpdateBookNameCommand(name, id);
         
         var error = await _mediator.Send(command);
         

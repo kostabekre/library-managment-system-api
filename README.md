@@ -1,4 +1,4 @@
-# Library management System
+# Library management System API
 
 It's my personal project that allows me to improve my skills.
 

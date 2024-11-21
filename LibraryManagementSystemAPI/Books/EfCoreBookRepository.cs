@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using LibraryManagementSystemAPI.Authors.Models;
 using LibraryManagementSystemAPI.Books.CoverValidation;
 using LibraryManagementSystemAPI.Books.Data;
 using LibraryManagementSystemAPI.Context;
@@ -17,11 +18,27 @@ public class EfCoreBookRepository : IBookRepository
         _bookContext = bookContext;
     }
 
+    public async Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoByPublisherIdAsync(int publisherId) => await _bookContext.Books
+        .AsNoTracking()
+        .Include(b => b.Publisher)
+        .Include(b => b.Authors)
+        .Where(b => b.Publisher.Id == publisherId)
+        .Select(b => new BookShortInfo(b.Id, b.Name, new AuthorShortInfo(b.Authors!.First().Id, b.Authors!.First().Name)))
+        .ToListAsync();
+
+    public async Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoByAuthorIdAsync(int authorId) => await _bookContext.Books
+        .AsNoTracking()
+        .Include(b => b.Publisher)
+        .Include(b => b.Authors)
+        .Where(b => b.Authors.Any(a => a.Id == authorId))
+        .Select(b => new BookShortInfo(b.Id, b.Name, new AuthorShortInfo(b.Authors!.First().Id, b.Authors!.First().Name)))
+        .ToListAsync();
+
     public async Task<IEnumerable<BookShortInfo>> GetAllBooksShortInfoAsync() => await _bookContext.Books
         .AsNoTracking()
         .Include(b => b.Publisher)
         .Include(b => b.Authors)
-        .Select(b => new BookShortInfo(b.Id, b.Name,b.Authors!.First().Name, b.Publisher!.Name))
+        .Select(b => new BookShortInfo(b.Id, b.Name, new AuthorShortInfo(b.Authors!.First().Id, b.Authors!.First().Name)))
         .ToListAsync();
 
     public async Task<PagedList<BookShortInfo>> GetBooksShortInfoAsync(BookParameters parameters)
@@ -33,7 +50,7 @@ public class EfCoreBookRepository : IBookRepository
             .Take(parameters.PageSize)
             .Include(b => b.Authors)
             .Include(b => b.Publisher)
-            .Select(b => new BookShortInfo(b.Id, b.Name, b.Authors!.First().Name, b.Publisher!.Name))
+            .Select(b => new BookShortInfo(b.Id, b.Name, new AuthorShortInfo(b.Authors!.First().Id, b.Authors!.First().Name)))
             .ToListAsync();
 
         return new PagedList<BookShortInfo>(result, parameters.PageSize, parameters.PageNumber, result.Count);
@@ -114,6 +131,7 @@ public class EfCoreBookRepository : IBookRepository
         }
         
         book.Name = bookDto.Name;
+        book.Description = bookDto.Description;
         
         if (book.BookGenres != null)
         {
@@ -207,6 +225,16 @@ public class EfCoreBookRepository : IBookRepository
         }
 
         return true;
+    }
+
+    public async Task<bool> UpdateBookNameAsyns(int id, string newName)
+    {
+        int rowsUpdated  = await _bookContext.Books
+            .Where(book => book.Id == id)
+            .ExecuteUpdateAsync(parameters => 
+                parameters.SetProperty(c => c.Name, newName));
+
+        return rowsUpdated > 0;
     }
 
     public async Task<bool> UpdateBookAmountAsync(int id, int amount)

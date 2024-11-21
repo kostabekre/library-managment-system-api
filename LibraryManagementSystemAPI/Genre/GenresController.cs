@@ -47,8 +47,9 @@ public class GenresController : ControllerBase
         return error != null ? NotFound() : Ok();
     }
     
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [Route("get_all")]
     public async Task<ActionResult<IEnumerable<GenreFullInfo>>> GetAllGenres()
     {

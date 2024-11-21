@@ -8,6 +8,7 @@ public class BookInfo
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
+    public string? Description { get; init; }
     public string Isbn { get; set; } = null!;
     public IEnumerable<AuthorFullInfo> Authors { get; set; } = null!;
     public PublisherFullInfo? Publisher { get; set; }
@@ -22,6 +23,7 @@ public class BookInfo
     {
         Id = book.Id;
         Name = book.Name;
+        Description = book.Description;
         Isbn = book.ISBN;
         Authors = book.Authors!.Select(a => (AuthorFullInfo)a).ToList();
         Publisher = (PublisherFullInfo)book.Publisher!;
